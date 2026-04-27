@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto;letter-spacing:0.06em}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0A500,#E85D4A);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(59,111,232,0.2);color:#7EB8FF;border-color:rgba(59,111,232,0.3)}
+
+/* TWO-PANEL LAYOUT */
+.main{margin-left:220px;flex:1;display:flex;max-height:100vh;overflow:hidden}
+.toc-panel{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
+.toc-search{padding:16px}
+.toc-input{width:100%;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg);font-family:inherit;font-size:13px;outline:none}
+.toc-input:focus{border-color:var(--accent-blue)}
+.toc-list{flex:1;overflow-y:auto;padding:8px}
+.toc-section{margin-bottom:4px}
+.toc-section-title{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:8px 12px 4px;font-weight:500}
+.toc-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius-sm);font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.12s}
+.toc-item:hover{background:var(--bg);color:var(--text)}
+.toc-item.active{background:var(--bg);color:var(--accent-blue);font-weight:500}
+.toc-item.active::before{content:'';width:3px;height:16px;background:var(--accent-blue);border-radius:2px;flex-shrink:0;margin-left:-3px}
+.toc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.toc-updated{font-size:9px;background:var(--accent-amber);color:#fff;border-radius:3px;padding:1px 5px;margin-left:auto}
+
+/* CONTENT PANEL */
+.content-panel{flex:1;overflow-y:auto;padding:32px 40px;max-width:800px}
+.doc-header{margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+.doc-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px;margin-bottom:6px}
+.doc-header h1 em{font-style:italic;color:var(--accent-purple)}
+.doc-meta{font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.doc-section{margin-bottom:40px;scroll-margin-top:24px}
+.ds-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.ds-icon{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.ds-body{font-size:14px;line-height:1.75;color:var(--text)}
+.ds-body p{margin-bottom:12px}
+.ds-body strong{font-weight:600}
+.ds-body ul,
+.ds-body ol{padding-left:20px;margin-bottom:12px}
+.ds-body li{margin-bottom:6px}
+
+/* ACCORDION */
+.accordion{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-top:16px}
+.acc-item{border-bottom:1px solid var(--border)}
+.acc-item:last-child{border-bottom:none}
+.acc-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;font-weight:500;font-size:14px;transition:background 0.1s;user-select:none}
+.acc-head:hover{background:var(--bg)}
+.acc-arrow{transition:transform 0.2s;font-size:12px;color:var(--muted)}
+.acc-head.open .acc-arrow{transform:rotate(90deg)}
+.acc-body{display:none;padding:14px 16px 18px;font-size:13px;line-height:1.7;color:var(--muted);border-top:1px solid var(--border);background:var(--bg)}
+.acc-body.open{display:block}
+
+/* CALLOUT BOXES */
+.callout{border-radius:var(--radius-sm);padding:14px 16px;margin:16px 0;border-left:3px solid;font-size:13px;line-height:1.6}
+.callout-blue{background:#EBF0FD;border-color:var(--accent-blue);color:#2850C0}
+.callout-amber{background:#FEF3DC;border-color:var(--accent-amber);color:#A06500}
+.callout-green{background:#E8F7F2;border-color:var(--accent-green);color:#1A7A57}
+
+/* INFO TABLE */
+.info-table{width:100%;border-collapse:collapse;margin:12px 0;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border)}
+.info-table th{background:var(--bg);padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);border-bottom:1px solid var(--border)}
+.info-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid var(--border)}
+.info-table tr:last-child td{border-bottom:none}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.doc-section{animation:fadeUp 0.25s ease both}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="03-team.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/></svg>Team</a>
+      <a class="nav-item" href="04-leaderboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+      <a class="nav-item active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h4M5 8h4M5 11h2"/><rect x="10" y="1" width="4" height="14" rx="1"/></svg>Handbook</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>Client Budgets</a>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+      <a class="nav-item" href="06-partners.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l4-4 4 4 4-4"/></svg>Partners</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only" href="admin/01-invoices.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/02-sales-pipeline.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/03-analytics.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="07-hiring.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="role-toggle"><button class="rt-btn active">Employee</button><button class="rt-btn">Admin</button></div>
+  <div class="sidebar-user"><div class="user-avatar">JL</div><div><div class="user-name">Jamie L.</div><div class="user-role">Designer</div></div></div>
+</aside>
+
+<!-- TOC PANEL -->
+<div class="toc-panel">
+  <div class="toc-search">
+    <input class="toc-input" placeholder="Search handbook…" oninput="searchHandbook(this.value)"/>
+  </div>
+  <div class="toc-list">
+    <div class="toc-section">
+      <div class="toc-section-title">Getting started</div>
+      <div class="toc-item active" onclick="scrollTo('welcome')"><div class="toc-dot" style="background:var(--accent-blue)"></div>Welcome to IDC</div>
+      <div class="toc-item" onclick="scrollTo('values')"><div class="toc-dot" style="background:var(--accent-purple)"></div>Our values</div>
+      <div class="toc-item" onclick="scrollTo('onboarding')"><div class="toc-dot" style="background:var(--accent-green)"></div>Onboarding checklist</div>
+    </div>
+    <div class="toc-section">
+      <div class="toc-section-title">Working here</div>
+      <div class="toc-item" onclick="scrollTo('hours')"><div class="toc-dot" style="background:var(--accent-amber)"></div>Hours & flexibility<span class="toc-updated">Updated</span></div>
+      <div class="toc-item" onclick="scrollTo('communication')"><div class="toc-dot" style="background:var(--accent-blue)"></div>Communication</div>
+      <div class="toc-item" onclick="scrollTo('tools')"><div class="toc-dot" style="background:var(--accent-coral)"></div>Tools & access</div>
+      <div class="toc-item" onclick="scrollTo('meetings')"><div class="toc-dot" style="background:var(--accent-purple)"></div>Meetings</div>
+    </div>
+    <div class="toc-section">
+      <div class="toc-section-title">Policies</div>
+      <div class="toc-item" onclick="scrollTo('pto')"><div class="toc-dot" style="background:var(--accent-green)"></div>Time off & PTO</div>
+      <div class="toc-item" onclick="scrollTo('expense')"><div class="toc-dot" style="background:var(--accent-amber)"></div>Expenses</div>
+      <div class="toc-item" onclick="scrollTo('nda')"><div class="toc-dot" style="background:var(--accent-coral)"></div>NDA & confidentiality</div>
+      <div class="toc-item" onclick="scrollTo('conduct')"><div class="toc-dot" style="background:var(--muted)"></div>Code of conduct</div>
+    </div>
+    <div class="toc-section">
+      <div class="toc-section-title">Benefits</div>
+      <div class="toc-item" onclick="scrollTo('benefits')"><div class="toc-dot" style="background:var(--accent-blue)"></div>Perks & benefits</div>
+      <div class="toc-item" onclick="scrollTo('learning')"><div class="toc-dot" style="background:var(--accent-purple)"></div>Learning budget</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT PANEL -->
+<div class="content-panel" id="content">
+  <div class="doc-header">
+    <h1>Employee <em>Handbook</em></h1>
+    <div class="doc-meta">
+      <span>Last updated: Mar 20, 2026</span>
+      <span>Version 2.4</span>
+      <span>Owner: Jordan Mills · Ops</span>
+    </div>
+  </div>
+
+  <div class="doc-section" id="welcome">
+    <div class="ds-title"><div class="ds-icon" style="background:#EBF0FD">👋</div>Welcome to IDC</div>
+    <div class="ds-body">
+      <p>Welcome to IDC — we're genuinely glad you're here. This handbook is your guide to how we work, what we value, and the things that keep us running smoothly as a team.</p>
+      <p>We're a small creative agency, which means everyone here has real impact. Your work shows up in client campaigns, in the quality of our output, and in the culture we build together every day.</p>
+      <div class="callout callout-blue">📌 If anything in this handbook is unclear or outdated, flag it to Jordan in Slack (#ops) and we'll update it. This is a living document.</div>
+      <p>This handbook covers everything from how we communicate day-to-day, to what tools we use, to policies around time off and expenses. Read it once when you start, then reference it as needed.</p>
+    </div>
+  </div>
+
+  <div class="doc-section" id="values">
+    <div class="ds-title"><div class="ds-icon" style="background:#F0EDFA">⭐</div>Our values</div>
+    <div class="ds-body">
+      <p>These aren't poster words — they're things we actually try to live by.</p>
+      <ul>
+        <li><strong>Do great work, honestly.</strong> Quality matters. So does owning your mistakes early.</li>
+        <li><strong>Clients come second.</strong> Team comes first. A healthy team produces better client work.</li>
+        <li><strong>Say the thing.</strong> We prefer honest, direct feedback to polite vagueness.</li>
+        <li><strong>Own your craft.</strong> Stay curious. Keep learning. Bring your full expertise to every brief.</li>
+        <li><strong>Make it fun.</strong> Friday Games exist for a reason. Enjoy the work.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="doc-section" id="onboarding">
+    <div class="ds-title"><div class="ds-icon" style="background:#E8F7F2">✅</div>Onboarding checklist</div>
+    <div class="ds-body">
+      <p>Complete these in your first week. Jordan will check in with you on day 5.</p>
+      <div class="accordion">
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">Day 1 — Accounts & access <span class="acc-arrow">›</span></div><div class="acc-body">Set up Google Workspace, Slack, Asana, Figma, and this portal. Get added to all relevant Slack channels by Jordan. Receive your Upwork invite if applicable.</div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">Day 2 — Meet the team <span class="acc-arrow">›</span></div><div class="acc-body">30-min intro calls with each team member. Calendar invites sent by Jordan. No agenda — just get to know each other.</div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">Day 3 — Client overview <span class="acc-arrow">›</span></div><div class="acc-body">Review active client briefs and Asana projects. Sit in on one client call (observer only). Ask Haley for the client context doc.</div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">Week 1 — First deliverable <span class="acc-arrow">›</span></div><div class="acc-body">Pick up a starter task from Asana (tagged "good first task"). Complete and submit for review by end of week. All good first tasks are low-stakes.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-section" id="hours">
+    <div class="ds-title"><div class="ds-icon" style="background:#FEF3DC">⏰</div>Hours & flexibility</div>
+    <div class="ds-body">
+      <div class="callout callout-amber">🆕 Updated Mar 2026: Core hours now start at 9:30am instead of 9am. Remote Fridays are now optional, not mandatory.</div>
+      <table class="info-table">
+        <thead><tr><th>Day</th><th>Core hours</th><th>Default location</th></tr></thead>
+        <tbody>
+          <tr><td>Monday – Thursday</td><td>9:30am – 5pm</td><td>Office (flexible remote with notice)</td></tr>
+          <tr><td>Friday</td><td>9:30am – 4pm</td><td>Your choice</td></tr>
+        </tbody>
+      </table>
+      <p>We track hours through Asana and the schedule portal. Log your time against client projects daily — this feeds directly into client billing.</p>
+      <p>Need to work different hours for a week? Message Jordan with at least 24 hours notice. We're flexible on timing as long as client commitments are met.</p>
+    </div>
+  </div>
+
+  <div class="doc-section" id="communication">
+    <div class="ds-title"><div class="ds-icon" style="background:#EBF0FD">💬</div>Communication</div>
+    <div class="ds-body">
+      <p>We use Slack for async and Zoom for sync. Here's the channel structure:</p>
+      <div class="accordion">
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">#general — Team announcements <span class="acc-arrow">›</span></div><div class="acc-body">Company-wide updates, big announcements, and things everyone should know. Posted by ops and leadership. Please keep it signal, not noise.</div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">#wins — Client & team wins <span class="acc-arrow">›</span></div><div class="acc-body">Share something that went well. Client compliment? Great deliverable? Closed a lead? Post it here. +15 leaderboard points per post.</div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">#creative-feedback — Work in progress <span class="acc-arrow">›</span></div><div class="acc-body">Post work that needs eyes. Be specific about what kind of feedback you want. Review requests must link to a Figma, doc, or video — not a screenshot.</div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">#learning — Resources & finds <span class="acc-arrow">›</span></div><div class="acc-body">Articles, tools, courses, techniques. Share what you're learning. +10 leaderboard points per share. Quality over quantity.</div></div>
+        <div class="acc-item"><div class="acc-head" onclick="toggleAcc(this)">#random — Everything else <span class="acc-arrow">›</span></div><div class="acc-body">Memes, recommendations, weekend plans, Friday Game banter. Be a human here.</div></div>
+      </div>
+      <div class="callout callout-blue">Slack response expectations: within 2 hours during core hours for DMs. Channel messages within same business day.</div>
+    </div>
+  </div>
+
+  <div class="doc-section" id="tools">
+    <div class="ds-title"><div class="ds-icon" style="background:#FDEDEB">🛠</div>Tools & access</div>
+    <div class="ds-body">
+      <table class="info-table">
+        <thead><tr><th>Tool</th><th>Used for</th><th>Who has access</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Figma</strong></td><td>Design, prototypes, assets</td><td>Design team + ops</td></tr>
+          <tr><td><strong>Asana</strong></td><td>Project & task management</td><td>All team</td></tr>
+          <tr><td><strong>Webflow</strong></td><td>Client site builds</td><td>Design team</td></tr>
+          <tr><td><strong>Stripe</strong></td><td>Invoicing & billing</td><td>Admin only</td></tr>
+          <tr><td><strong>Upwork</strong></td><td>Freelancer management</td><td>Admin + ops</td></tr>
+          <tr><td><strong>Monarch</strong></td><td>Expense tracking</td><td>Admin + ops</td></tr>
+          <tr><td><strong>Google Workspace</strong></td><td>Docs, sheets, email</td><td>All team</td></tr>
+          <tr><td><strong>This portal</strong></td><td>Internal ops, scheduling, HR</td><td>All team (role-gated)</td></tr>
+        </tbody>
+      </table>
+      <p>Request new tool access via Slack #ops or directly to Jordan. We'll provision within 1 business day.</p>
+    </div>
+  </div>
+
+  <div class="doc-section" id="pto">
+    <div class="ds-title"><div class="ds-icon" style="background:#E8F7F2">🌴</div>Time off & PTO</div>
+    <div class="ds-body">
+      <p>Full-time employees receive <strong>20 days PTO per year</strong>, plus public holidays in your region. PTO does not roll over.</p>
+      <ul>
+        <li>Request PTO in the schedule portal at least <strong>5 business days</strong> in advance</li>
+        <li>For absences over 5 days, request <strong>2 weeks</strong> in advance</li>
+        <li>Jordan will approve and add it to the team calendar</li>
+        <li>Sick days are separate and unlimited — just let Jordan know by 9am</li>
+      </ul>
+      <div class="callout callout-green">IDC closes for 2 weeks over Christmas/New Year (Dec 24 – Jan 2). These days are not deducted from your PTO.</div>
+    </div>
+  </div>
+
+  <div class="doc-section" id="expense">
+    <div class="ds-title"><div class="ds-icon" style="background:#FEF3DC">💳</div>Expenses</div>
+    <div class="ds-body">
+      <p>All client-related expenses are reimbursable with a receipt. Submit through the expenses section of this portal.</p>
+      <table class="info-table">
+        <thead><tr><th>Category</th><th>Limit</th><th>Approval required</th></tr></thead>
+        <tbody>
+          <tr><td>Software / tools</td><td>$100/mo</td><td>No (under limit)</td></tr>
+          <tr><td>Learning & courses</td><td>$500/year</td><td>Jordan sign-off</td></tr>
+          <tr><td>Client entertainment</td><td>$150/event</td><td>Haley sign-off</td></tr>
+          <tr><td>Travel</td><td>No set limit</td><td>Admin sign-off</td></tr>
+          <tr><td>Equipment</td><td>$250/year</td><td>Jordan sign-off</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="doc-section" id="benefits">
+    <div class="ds-title"><div class="ds-icon" style="background:#EBF0FD">🎁</div>Perks & benefits</div>
+    <div class="ds-body">
+      <ul>
+        <li>🏥 <strong>Health insurance</strong> — covered 80% by IDC</li>
+        <li>📚 <strong>$500/year learning budget</strong> — courses, books, conferences</li>
+        <li>💻 <strong>Equipment stipend</strong> — $250/year for desk setup</li>
+        <li>☕ <strong>Free coffee</strong> — always. Non-negotiable.</li>
+        <li>🎮 <strong>Friday Games</strong> — weekly team game, prizes, leaderboard points</li>
+        <li>🎉 <strong>Quarterly team dinner</strong> — on the company</li>
+        <li>🧘 <strong>Flexible Fridays</strong> — work from wherever</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end content-panel -->
+
+<script>
+function toggleAcc(head){
+  const isOpen=head.classList.contains('open');
+  document.querySelectorAll('.acc-head').forEach(h=>{h.classList.remove('open');h.nextElementSibling.classList.remove('open');});
+  if(!isOpen){head.classList.add('open');head.nextElementSibling.classList.add('open');}
+}
+function scrollTo(id){
+  const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.toc-item').forEach(i=>i.classList.remove('active'));
+  // highlight
+  event.currentTarget.classList.add('active');
+}
+function searchHandbook(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('.doc-section').forEach(s=>{
+    s.style.display=s.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+</script>
+</body>
+</html>

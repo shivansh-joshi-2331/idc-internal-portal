@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Sales Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+  --blue-bg:#EBF0FD;--blue-border:#C0D0F8;--blue-text:#2850C0;
+  --green-bg:#E8F7F2;--green-border:#A8DEC8;--green-text:#1A7A57;
+  --coral-bg:#FDEDEB;--coral-border:#F5BDB5;--coral-text:#B03020;
+  --amber-bg:#FEF3DC;--amber-border:#F0D490;--amber-text:#A06500;
+  --purple-bg:#F0EDFA;--purple-border:#C8B8F0;--purple-text:#5C3E9A;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.nav-item.admin-only.active{border-left-color:var(--accent-amber)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto;letter-spacing:0.06em}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0A500,#E85D4A);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(240,165,0,0.2);color:var(--accent-amber);border-color:rgba(240,165,0,0.3)}
+.main{margin-left:220px;flex:1;padding:32px;overflow-x:auto}
+.page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--accent-green)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+.role-gate{background:var(--surface);border-radius:var(--radius);border:2px dashed var(--border);padding:60px 40px;text-align:center;max-width:600px}
+.gate-icon{font-size:48px;margin-bottom:16px}
+.gate-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;margin-bottom:8px}
+.gate-body{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 24px;line-height:1.6}
+.gate-badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber-bg);color:var(--amber-text);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;border:1px solid var(--amber-border)}
+.admin-content{display:none}
+.admin-content.visible{display:block;animation:fadeUp 0.3s ease}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.stat-card{border-radius:var(--radius);padding:18px;border:1px solid;position:relative;overflow:hidden;transition:transform 0.15s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-card .ab{position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.c-blue{background:var(--blue-bg);border-color:var(--blue-border)}
+.stat-card.c-amber{background:var(--amber-bg);border-color:var(--amber-border)}
+.stat-card.c-green{background:var(--green-bg);border-color:var(--green-border)}
+.stat-card.c-purple{background:var(--purple-bg);border-color:var(--purple-border)}
+.stat-card.c-coral{background:var(--coral-bg);border-color:var(--coral-border)}
+.sl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:6px}
+.sv{font-family:'Fraunces',serif;font-size:24px;font-weight:600;letter-spacing:-0.5px;line-height:1}
+.ss{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* CONTROLS */
+.controls{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.src-pills{display:flex;gap:6px}
+.sp-btn{padding:6px 13px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s;font-family:inherit}
+.sp-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.vt{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px;margin-left:auto}
+.vt-btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all 0.15s;font-family:inherit}
+.vt-btn.active{background:var(--accent-blue);color:#fff}
+
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:repeat(6,minmax(210px,1fr));gap:10px;min-width:1100px}
+.k-col{background:var(--bg);border-radius:var(--radius);padding:12px;min-height:460px;border:1px solid var(--border)}
+.k-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.k-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em}
+.k-count{font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--surface);color:var(--muted);border:1px solid var(--border)}
+.k-add{width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--muted);background:transparent;cursor:pointer;color:var(--muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;line-height:1}
+.k-add:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+
+/* LEAD CARD */
+.lcard{background:var(--surface);border-radius:var(--radius-sm);padding:13px;margin-bottom:8px;border:1px solid var(--border);cursor:pointer;transition:all 0.18s;position:relative}
+.lcard:hover{border-color:#C8C0B0;box-shadow:0 2px 12px rgba(0,0,0,0.06);transform:translateY(-1px)}
+.lcard.due-today{border-left:3px solid var(--accent-amber);padding-left:10px}
+.lcard.overdue{border-left:3px solid var(--accent-coral);padding-left:10px}
+.lcard.won{border-left:3px solid var(--accent-green);padding-left:10px;opacity:0.8}
+.lcard.lost{border-left:3px solid var(--muted);padding-left:10px;opacity:0.55}
+.lc-co{font-size:13px;font-weight:600;margin-bottom:2px}
+.lc-ct{font-size:10px;color:var(--muted);margin-bottom:8px}
+.lc-tags{display:flex;gap:4px;margin-bottom:7px;flex-wrap:wrap}
+.src{font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px}
+.src-u{background:#E8F7E0;color:#1A6B00;border:1px solid #A8D890}
+.src-a{background:var(--blue-bg);color:var(--blue-text);border:1px solid var(--blue-border)}
+.src-r{background:var(--purple-bg);color:var(--purple-text);border:1px solid var(--purple-border)}
+.src-i{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)}
+.lc-val{font-family:'Fraunces',serif;font-size:14px;color:var(--accent-green);margin-bottom:7px}
+.lc-bot{display:flex;align-items:center;justify-content:space-between}
+.lc-av{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;flex-shrink:0;margin-right:4px}
+.lc-nm{font-size:10px;color:var(--muted)}
+.fp{font-size:9px;font-weight:600;padding:2px 7px;border-radius:4px}
+.fp-ok{background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-border)}
+.fp-today{background:var(--amber-bg);color:var(--amber-text);border:1px solid var(--amber-border)}
+.fp-ov{background:var(--coral-bg);color:var(--coral-text);border:1px solid var(--coral-border)}
+.asana-pip{position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;background:#E8622A}
+
+/* LIST VIEW */
+.list-view{display:none}
+.list-view.on{display:block}
+.kv.off{display:none}
+table.lt{width:100%;border-collapse:collapse}
+.lt thead{background:var(--bg)}
+.lt th{padding:11px 15px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border)}
+.lt td{padding:12px 15px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+.lt tr:last-child td{border-bottom:none}
+.lt tr:hover td{background:var(--bg)}
+.sp{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;border:1px solid transparent}
+.sp-lead{background:var(--bg);color:var(--muted);border-color:var(--border)}
+.sp-cont{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border)}
+.sp-prop{background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border)}
+.sp-neg{background:var(--purple-bg);color:var(--purple-text);border-color:var(--purple-border)}
+.sp-won{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border)}
+.sp-lost{background:var(--coral-bg);color:var(--coral-text);border-color:var(--coral-border)}
+
+/* DRAWER */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.4);backdrop-filter:blur(3px);z-index:200}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;right:-480px;width:460px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;padding:28px;overflow-y:auto;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.08)}
+.drawer.open{right:0}
+.drawer-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);margin-bottom:20px}
+.drawer-close:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.drawer-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:3px}
+.drawer-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 20px}
+.sg{padding:8px 4px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;text-align:center;background:transparent;transition:all 0.15s;font-family:inherit;color:var(--muted)}
+.sg:hover{border-color:#C8C0B0;color:var(--text)}
+.sg.active{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border)}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.drow:last-child{border-bottom:none}
+.dl{font-size:12px;color:var(--muted)}
+.dv{font-size:13px;font-weight:500}
+.notes{width:100%;height:80px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;resize:vertical;outline:none;color:var(--text);margin-top:8px}
+.notes:focus{border-color:var(--accent-blue)}
+.act-item{display:flex;gap:12px;margin-bottom:12px}
+.act-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.act-text{font-size:12px;line-height:1.6}
+.act-date{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.5);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);padding:28px;width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;animation:modalIn 0.25s cubic-bezier(0.34,1.4,0.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(0.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.form-row{margin-bottom:14px}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none}
+.form-input:focus,.form-select:focus{border-color:var(--accent-blue)}
+.asana-info{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--blue-text);margin-top:14px;display:flex;gap:8px;align-items:flex-start}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.btn-cancel{padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
+.btn-primary{background:var(--accent-blue);color:#fff}
+.btn-primary:hover{background:#2A5ED4}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s;margin-right:4px;font-family:inherit}
+.act-btn:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+#toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:600;display:flex;align-items:center;gap:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="../../idc-portal/01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="../../idc-portal/02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/></svg>Team</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="../../idc-portal/03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>Client Budgets</a>
+      <a class="nav-item" href="../../idc-portal/03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only" href="01-invoices-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="03-analytics-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="role-toggle">
+    <button class="rt-btn" onclick="setRole('employee',this)">Employee</button>
+    <button class="rt-btn active" onclick="setRole('admin',this)">Admin</button>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="uav">JL</div>
+    <div><div class="user-name">Jamie L.</div><div class="user-role" id="rlabel">Admin</div></div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div><h1>Sales <em>Pipeline</em></h1><p>Lead tracking · 2-day Asana follow-ups · Source analytics</p></div>
+    <div style="display:flex;gap:10px" id="aa">
+      <button class="btn btn-ghost">↓ Export</button>
+      <button class="btn btn-primary" onclick="document.getElementById('add-modal').classList.add('open')">+ Add lead</button>
+    </div>
+  </div>
+
+  <div class="role-gate" id="rgate" style="display:none">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">Admin access required</div>
+    <div class="gate-body">The sales pipeline is restricted to admin users only.</div>
+    <div class="gate-badge">Admin only · Sales</div>
+  </div>
+
+  <div class="admin-content visible" id="ac">
+    <div class="stats-row">
+      <div class="stat-card c-blue"><div class="ab" style="background:var(--accent-blue)"></div><div class="sl">Total leads</div><div class="sv" style="color:var(--blue-text)">24</div><div class="ss">8 active this week</div></div>
+      <div class="stat-card c-amber"><div class="ab" style="background:var(--accent-amber)"></div><div class="sl">Follow-ups due</div><div class="sv" style="color:var(--amber-text)">5</div><div class="ss">3 overdue</div></div>
+      <div class="stat-card c-green"><div class="ab" style="background:var(--accent-green)"></div><div class="sl">Won this month</div><div class="sv" style="color:var(--green-text)">3</div><div class="ss">$28,500 closed</div></div>
+      <div class="stat-card c-purple"><div class="ab" style="background:var(--accent-purple)"></div><div class="sl">Pipeline value</div><div class="sv" style="color:var(--purple-text)">$74k</div><div class="ss">Weighted forecast</div></div>
+      <div class="stat-card c-coral"><div class="ab" style="background:var(--accent-coral)"></div><div class="sl">Win rate</div><div class="sv" style="color:var(--coral-text)">38%</div><div class="ss">↑ 5% vs last qtr</div></div>
+    </div>
+
+    <div class="controls">
+      <div style="font-size:12px;color:var(--muted)">Source:</div>
+      <div class="src-pills">
+        <button class="sp-btn active" onclick="filterSrc('all',this)">All</button>
+        <button class="sp-btn" onclick="filterSrc('u',this)">Upwork</button>
+        <button class="sp-btn" onclick="filterSrc('a',this)">Ads</button>
+        <button class="sp-btn" onclick="filterSrc('r',this)">Referral</button>
+        <button class="sp-btn" onclick="filterSrc('i',this)">Inbound</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 14px">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#E8622A"></span>Asana active
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent-amber)"></span>Due today
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent-coral)"></span>Overdue
+      </div>
+      <div class="vt">
+        <button class="vt-btn active" onclick="setView('k',this)">Kanban</button>
+        <button class="vt-btn" onclick="setView('l',this)">List</button>
+      </div>
+    </div>
+
+    <!-- KANBAN -->
+    <div class="kv" id="kv">
+      <div class="kanban">
+        <!-- LEAD -->
+        <div class="k-col">
+          <div class="k-head"><div class="k-title" style="color:var(--muted)">Lead</div><div style="display:flex;align-items:center;gap:6px"><div class="k-count">3</div><button class="k-add" onclick="document.getElementById('add-modal').classList.add('open')">+</button></div></div>
+          <div class="lcard due-today" data-src="u" onclick="openD('Pixel Forge Studios')">
+            <div class="lc-co">Pixel Forge Studios</div><div class="lc-ct">marcus@pixelforge.io</div>
+            <div class="lc-tags"><span class="src src-u">Upwork</span></div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div><span class="lc-nm">Haley</span></div><span class="fp fp-ok">Apr 2</span></div>
+          </div>
+          <div class="lcard" data-src="a" onclick="openD('Summit Media')">
+            <div class="asana-pip"></div>
+            <div class="lc-co">Summit Media</div><div class="lc-ct">dana@summitmedia.co</div>
+            <div class="lc-tags"><span class="src src-a">Ads</span></div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div><span class="lc-nm">Roger</span></div><span class="fp fp-today">Today</span></div>
+          </div>
+          <div class="lcard" data-src="i" onclick="openD('Clearpath Health')">
+            <div class="asana-pip"></div>
+            <div class="lc-co">Clearpath Health</div><div class="lc-ct">priya@clearpath.org</div>
+            <div class="lc-tags"><span class="src src-i">Inbound</span></div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div><span class="lc-nm">Jordan</span></div><span class="fp fp-today">Today</span></div>
+          </div>
+        </div>
+
+        <!-- CONTACTED -->
+        <div class="k-col">
+          <div class="k-head"><div class="k-title" style="color:var(--accent-blue)">Contacted</div><div style="display:flex;align-items:center;gap:6px"><div class="k-count">4</div><button class="k-add">+</button></div></div>
+          <div class="lcard overdue" data-src="r" onclick="openD('Waveline Agency')">
+            <div class="asana-pip"></div>
+            <div class="lc-co">Waveline Agency</div><div class="lc-ct">tom@waveline.agency</div>
+            <div class="lc-tags"><span class="src src-r">Referral</span></div>
+            <div class="lc-val">~$4,500/mo</div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div><span class="lc-nm">Haley</span></div><span class="fp fp-ov">2d overdue</span></div>
+          </div>
+          <div class="lcard" data-src="u" onclick="openD('Orbit Creative')">
+            <div class="lc-co">Orbit Creative</div><div class="lc-ct">jess@orbitcreative.com</div>
+            <div class="lc-tags"><span class="src src-u">Upwork</span></div>
+            <div class="lc-val">~$2,200/mo</div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div><span class="lc-nm">Roger</span></div><span class="fp fp-ok">Apr 4</span></div>
+          </div>
+          <div class="lcard overdue" data-src="a" onclick="openD('BlueShift Labs')">
+            <div class="asana-pip"></div>
+            <div class="lc-co">BlueShift Labs</div><div class="lc-ct">alex@blueshift.io</div>
+            <div class="lc-tags"><span class="src src-a">Ads</span></div>
+            <div class="lc-val">~$6,000/mo</div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div><span class="lc-nm">Jordan</span></div><span class="fp fp-ov">4d overdue</span></div>
+          </div>
+        </div>
+
+        <!-- PROPOSAL SENT -->
+        <div class="k-col">
+          <div class="k-head"><div class="k-title" style="color:var(--accent-amber)">Proposal sent</div><div style="display:flex;align-items:center;gap:6px"><div class="k-count">3</div><button class="k-add">+</button></div></div>
+          <div class="lcard due-today" data-src="r" onclick="openD('Vega Brands')">
+            <div class="asana-pip"></div>
+            <div class="lc-co">Vega Brands</div><div class="lc-ct">nina@vegabrands.com</div>
+            <div class="lc-tags"><span class="src src-r">Referral</span></div>
+            <div class="lc-val">$8,000/mo</div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div><span class="lc-nm">Haley</span></div><span class="fp fp-today">Today</span></div>
+          </div>
+          <div class="lcard" data-src="i" onclick="openD('Hartwell Group')">
+            <div class="lc-co">Hartwell Group</div><div class="lc-ct">chris@hartwell.co</div>
+            <div class="lc-tags"><span class="src src-i">Inbound</span></div>
+            <div class="lc-val">$5,500/mo</div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div><span class="lc-nm">Roger</span></div><span class="fp fp-ok">Apr 5</span></div>
+          </div>
+        </div>
+
+        <!-- NEGOTIATING -->
+        <div class="k-col">
+          <div class="k-head"><div class="k-title" style="color:var(--accent-purple)">Negotiating</div><div style="display:flex;align-items:center;gap:6px"><div class="k-count">2</div><button class="k-add">+</button></div></div>
+          <div class="lcard" data-src="a" onclick="openD('Solstice Digital')">
+            <div class="asana-pip"></div>
+            <div class="lc-co">Solstice Digital</div><div class="lc-ct">mia@solstice.digital</div>
+            <div class="lc-tags"><span class="src src-a">Ads</span></div>
+            <div class="lc-val">$12,000/mo</div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div><span class="lc-nm">Haley</span></div><span class="fp fp-ok">Call Apr 2</span></div>
+          </div>
+          <div class="lcard" data-src="r" onclick="openD('Nexus Collective')">
+            <div class="lc-co">Nexus Collective</div><div class="lc-ct">sam@nexus.co</div>
+            <div class="lc-tags"><span class="src src-r">Referral</span></div>
+            <div class="lc-val">$7,200/mo</div>
+            <div class="lc-bot"><div style="display:flex;align-items:center"><div class="lc-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div><span class="lc-nm">Jordan</span></div><span class="fp fp-ok">Apr 6</span></div>
+          </div>
+        </div>
+
+        <!-- WON -->
+        <div class="k-col">
+          <div class="k-head"><div class="k-title" style="color:var(--accent-green)">Won</div><div class="k-count">3</div></div>
+          <div class="lcard won" data-src="u"><div class="lc-co">Orion Labs</div><div class="lc-ct">ben@orionlabs.io</div><div class="lc-tags"><span class="src src-u">Upwork</span></div><div class="lc-val">$6,500/mo</div></div>
+          <div class="lcard won" data-src="r"><div class="lc-co">Meridian Co.</div><div class="lc-ct">fiona@meridian.co</div><div class="lc-tags"><span class="src src-r">Referral</span></div><div class="lc-val">$2,800/mo</div></div>
+          <div class="lcard won" data-src="a"><div class="lc-co">Skybridge Tech</div><div class="lc-ct">leon@skybridge.tech</div><div class="lc-tags"><span class="src src-a">Ads</span></div><div class="lc-val">$19,200 project</div></div>
+        </div>
+
+        <!-- LOST -->
+        <div class="k-col">
+          <div class="k-head"><div class="k-title" style="color:var(--muted)">Lost</div><div class="k-count">2</div></div>
+          <div class="lcard lost" data-src="a"><div class="lc-co">Prism Agency</div><div class="lc-ct">kate@prism.agency</div><div class="lc-tags"><span class="src src-a">Ads</span></div><div style="font-size:10px;color:var(--accent-coral);margin-top:6px">Budget constraints</div></div>
+          <div class="lcard lost" data-src="u"><div class="lc-co">Velox Media</div><div class="lc-ct">greg@velox.media</div><div class="lc-tags"><span class="src src-u">Upwork</span></div><div style="font-size:10px;color:var(--accent-coral);margin-top:6px">Went with competitor</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div class="list-view" id="lv">
+      <div style="background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden">
+        <table class="lt">
+          <thead><tr><th>Company</th><th>Contact</th><th>Source</th><th>Stage</th><th>Value</th><th>Assigned</th><th>Follow-up</th><th>Asana</th><th></th></tr></thead>
+          <tbody>
+            <tr><td><strong>Vega Brands</strong></td><td style="color:var(--muted);font-size:12px">Nina L.</td><td><span class="src src-r">Referral</span></td><td><span class="sp sp-prop">Proposal sent</span></td><td style="font-family:'Fraunces',serif;font-size:16px">$8k/mo</td><td>Haley</td><td style="color:var(--accent-amber);font-weight:500;font-size:12px">Today</td><td><span style="font-size:10px;color:#B85000;background:#FFF0E6;border:1px solid #F0C898;border-radius:4px;padding:2px 7px">Task active</span></td><td><button class="act-btn">Edit</button></td></tr>
+            <tr><td><strong>Solstice Digital</strong></td><td style="color:var(--muted);font-size:12px">Mia F.</td><td><span class="src src-a">Ads</span></td><td><span class="sp sp-neg">Negotiating</span></td><td style="font-family:'Fraunces',serif;font-size:16px">$12k/mo</td><td>Haley</td><td style="color:var(--accent-green);font-size:12px">Apr 2</td><td><span style="font-size:10px;color:#B85000;background:#FFF0E6;border:1px solid #F0C898;border-radius:4px;padding:2px 7px">Task active</span></td><td><button class="act-btn">Edit</button></td></tr>
+            <tr><td><strong>BlueShift Labs</strong></td><td style="color:var(--muted);font-size:12px">Alex P.</td><td><span class="src src-a">Ads</span></td><td><span class="sp sp-cont">Contacted</span></td><td style="font-family:'Fraunces',serif;font-size:16px">~$6k/mo</td><td>Jordan</td><td style="color:var(--accent-coral);font-weight:500;font-size:12px">4d overdue</td><td><span style="font-size:10px;color:#B85000;background:#FFF0E6;border:1px solid #F0C898;border-radius:4px;padding:2px 7px">Task active</span></td><td><button class="act-btn">Edit</button></td></tr>
+            <tr><td><strong>Orion Labs</strong></td><td style="color:var(--muted);font-size:12px">Ben C.</td><td><span class="src src-u">Upwork</span></td><td><span class="sp sp-won">Won ✓</span></td><td style="font-family:'Fraunces',serif;font-size:16px">$6.5k/mo</td><td>Haley</td><td style="color:var(--muted);font-size:12px">—</td><td style="color:var(--muted);font-size:13px">—</td><td><button class="act-btn">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- LEAD DRAWER -->
+<div class="drawer-overlay" id="dov" onclick="closeD()"></div>
+<div class="drawer" id="drw">
+  <button class="drawer-close" onclick="closeD()">✕</button>
+  <div class="drawer-title" id="d-co">Waveline Agency</div>
+  <div class="drawer-sub">tom@waveline.agency · Referral</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <span style="font-size:10px;color:#B85000;background:#FFF0E6;border:1px solid #F0C898;border-radius:4px;padding:3px 8px;font-weight:500">Asana task #98212</span>
+    <span class="sp sp-cont">Contacted</span>
+  </div>
+  <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px">Move stage</div>
+  <div class="stage-grid">
+    <button class="sg">Lead</button><button class="sg active">Contacted</button><button class="sg">Proposal</button>
+    <button class="sg">Negotiating</button><button class="sg" style="background:var(--green-bg);color:var(--green-text);border-color:var(--green-border)">Won</button><button class="sg" style="color:var(--accent-coral)">Lost</button>
+  </div>
+  <div class="drow"><span class="dl">Est. value</span><span class="dv" style="color:var(--accent-green);font-family:'Fraunces',serif;font-size:18px">~$4,500/mo</span></div>
+  <div class="drow"><span class="dl">Lead source</span><span class="dv">Referral (Roger G.)</span></div>
+  <div class="drow"><span class="dl">Assigned to</span><span class="dv">Haley L.</span></div>
+  <div class="drow"><span class="dl">First contact</span><span class="dv">Mar 18, 2026</span></div>
+  <div class="drow"><span class="dl">Last follow-up</span><span class="dv" style="color:var(--accent-coral)">Mar 26 (overdue)</span></div>
+  <div class="drow"><span class="dl">Auto follow-up</span><span class="dv">Every 2 business days</span></div>
+  <div style="margin-top:16px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:6px">Notes</div>
+    <textarea class="notes">Interested in social media management. Budget convo needed — mentioned $3–5k range. Follow up after board meeting Apr 2.</textarea>
+  </div>
+  <div style="margin-top:16px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px">Activity</div>
+    <div class="act-item"><div class="act-dot" style="background:var(--accent-coral)"></div><div><div class="act-text">Asana follow-up task auto-created (overdue)</div><div class="act-date">Mar 28, 2026</div></div></div>
+    <div class="act-item"><div class="act-dot" style="background:var(--accent-amber)"></div><div><div class="act-text">Follow-up email sent · No response yet</div><div class="act-date">Mar 26, 2026</div></div></div>
+    <div class="act-item"><div class="act-dot" style="background:var(--accent-blue)"></div><div><div class="act-text">Discovery call · 30 min · Positive</div><div class="act-date">Mar 22, 2026</div></div></div>
+    <div class="act-item"><div class="act-dot" style="background:var(--accent-green)"></div><div><div class="act-text">Lead added via referral from Roger G.</div><div class="act-date">Mar 18, 2026</div></div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:22px">
+    <button class="btn btn-primary" style="flex:1" onclick="showToast('Changes saved','✓');closeD()">Save changes</button>
+    <button class="btn btn-ghost" onclick="showToast('Activity logged','📝')">+ Log activity</button>
+  </div>
+</div>
+
+<!-- ADD LEAD MODAL -->
+<div class="modal-overlay" id="add-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-title">Add lead</div><div class="modal-sub">Asana follow-up task auto-created on save</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-row"><label class="form-label">Company</label><input class="form-input" placeholder="Company name"/></div>
+      <div class="form-row"><label class="form-label">Contact name</label><input class="form-input" placeholder="First Last"/></div>
+    </div>
+    <div class="form-row"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="contact@company.com"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-row"><label class="form-label">Lead source</label><select class="form-select"><option>Upwork</option><option>Facebook Ads</option><option>Referral</option><option>Inbound</option></select></div>
+      <div class="form-row"><label class="form-label">Assigned to</label><select class="form-select"><option>Haley L.</option><option>Roger G.</option><option>Jordan M.</option></select></div>
+    </div>
+    <div class="form-row"><label class="form-label">Estimated value</label><input class="form-input" placeholder="e.g. $5,000/mo"/></div>
+    <div class="form-row"><label class="form-label">Notes</label><textarea class="form-input" style="height:70px;resize:vertical" placeholder="Initial notes..."></textarea></div>
+    <div class="asana-info">📋 An Asana follow-up task will be auto-created and recur every 2 business days until Won or Lost.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="this.closest('.modal-overlay').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" onclick="this.closest('.modal-overlay').classList.remove('open');showToast('Lead added + Asana task created','📋')">Add lead + create task</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>
+function setRole(r,btn){
+  document.querySelectorAll('.rt-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('rlabel').textContent=r==='admin'?'Admin':'Employee';
+  document.getElementById('rgate').style.display=r==='employee'?'block':'none';
+  const ac=document.getElementById('ac');const aa=document.getElementById('aa');
+  if(r==='employee'){ac.classList.remove('visible');aa.style.display='none';}
+  else{ac.classList.add('visible');aa.style.display='flex';}
+  document.getElementById('uav').style.background=r==='admin'?'linear-gradient(135deg,#F0A500,#E85D4A)':'linear-gradient(135deg,#3B6FE8,#7C5CBF)';
+}
+function setView(v,el){
+  document.querySelectorAll('.vt-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  document.getElementById('kv').classList.toggle('off',v==='l');
+  document.getElementById('lv').classList.toggle('on',v==='l');
+}
+function filterSrc(s,el){
+  document.querySelectorAll('.sp-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  document.querySelectorAll('.lcard').forEach(c=>{c.style.display=(s==='all'||c.dataset.src===s)?'':'none';});
+}
+function openD(co){
+  document.getElementById('d-co').textContent=co;
+  document.getElementById('drw').classList.add('open');
+  document.getElementById('dov').classList.add('open');
+}
+function closeD(){document.getElementById('drw').classList.remove('open');document.getElementById('dov').classList.remove('open');}
+function showToast(m,i='✓'){const t=document.getElementById('toast');t.innerHTML=`<span style="font-size:16px">${i}</span>${m}`;t.style.transform='translateY(0)';t.style.opacity='1';setTimeout(()=>{t.style.transform='translateY(80px)';t.style.opacity='0';},3000);}
+</script>
+</body>
+</html>

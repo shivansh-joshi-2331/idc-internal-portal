@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Analytics Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+  --blue-bg:#EBF0FD;--blue-border:#C0D0F8;--blue-text:#2850C0;
+  --green-bg:#E8F7F2;--green-border:#A8DEC8;--green-text:#1A7A57;
+  --coral-bg:#FDEDEB;--coral-border:#F5BDB5;--coral-text:#B03020;
+  --amber-bg:#FEF3DC;--amber-border:#F0D490;--amber-text:#A06500;
+  --purple-bg:#F0EDFA;--purple-border:#C8B8F0;--purple-text:#5C3E9A;
+  --pink-bg:#FDE8F4;--pink-border:#F0B8D8;--pink-text:#A0205A;
+  --teal-bg:#E0F5EF;--teal-border:#88D8C0;--teal-text:#106B58;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.nav-item.admin-only.active{border-left-color:var(--accent-amber)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto;letter-spacing:0.06em}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0A500,#E85D4A);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(240,165,0,0.2);color:var(--accent-amber);border-color:rgba(240,165,0,0.3)}
+.main{margin-left:220px;flex:1;padding:32px;max-width:1200px}
+.page-header{margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--accent-purple)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+.role-gate{background:var(--surface);border-radius:var(--radius);border:2px dashed var(--border);padding:60px 40px;text-align:center;max-width:600px}
+.gate-icon{font-size:48px;margin-bottom:16px}
+.gate-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;margin-bottom:8px}
+.gate-body{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 24px;line-height:1.6}
+.gate-badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber-bg);color:var(--amber-text);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;border:1px solid var(--amber-border)}
+.admin-content{display:none}
+.admin-content.visible{display:block;animation:fadeUp 0.3s ease}
+
+/* SYNC */
+.sync-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:20px;border:1px solid var(--border);font-size:12px;color:var(--muted);background:var(--surface)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--accent-green)}
+
+/* DATE TABS */
+.date-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px}
+.dt{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--muted);border:none;background:transparent;transition:all 0.15s;font-family:inherit}
+.dt.active{background:var(--accent-blue);color:#fff}
+
+/* SECTION CARD */
+.sec-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:20px;transition:box-shadow 0.15s}
+.sec-card:hover{box-shadow:0 2px 16px rgba(0,0,0,0.06)}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
+.sec-title-row{display:flex;align-items:center;gap:12px}
+.sec-icon{width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sec-title{font-family:'Fraunces',serif;font-size:20px;font-weight:300;font-style:italic}
+.sec-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.sec-body{padding:22px}
+
+/* STAT STRIPS */
+.sr4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sr5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.sr3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.sc{border-radius:var(--radius-sm);padding:16px;border:1px solid;transition:transform 0.15s}
+.sc:hover{transform:translateY(-1px)}
+.sc.c-blue{background:var(--blue-bg);border-color:var(--blue-border)}
+.sc.c-green{background:var(--green-bg);border-color:var(--green-border)}
+.sc.c-amber{background:var(--amber-bg);border-color:var(--amber-border)}
+.sc.c-coral{background:var(--coral-bg);border-color:var(--coral-border)}
+.sc.c-purple{background:var(--purple-bg);border-color:var(--purple-border)}
+.sc.c-teal{background:var(--teal-bg);border-color:var(--teal-border)}
+.sc.plain{background:var(--bg);border-color:var(--border)}
+.sc-l{font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px}
+.sc-v{font-family:'Fraunces',serif;font-size:24px;font-weight:600;letter-spacing:-0.5px;line-height:1;margin-bottom:4px}
+.sc-d{font-size:11px;color:var(--muted)}
+.d-up{color:var(--accent-green)}
+.d-dn{color:var(--accent-coral)}
+
+/* PLATFORM CARDS */
+.plat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.plat{border-radius:var(--radius-sm);padding:16px;border:1px solid;transition:transform 0.15s}
+.plat:hover{transform:translateY(-1px)}
+.plat.ig{background:var(--pink-bg);border-color:var(--pink-border)}
+.plat.li{background:var(--blue-bg);border-color:var(--blue-border)}
+.plat.tw{background:var(--teal-bg);border-color:var(--teal-border)}
+.plat-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.plat-icon{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:15px}
+.plat-name{font-size:13px;font-weight:600}
+.plat-handle{font-size:10px;color:var(--muted)}
+.plat-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.plat-val{font-family:'Fraunces',serif;font-size:18px;line-height:1;margin-bottom:2px}
+.plat-lbl{font-size:9px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)}
+
+/* CHART */
+.chart-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px}
+.chart-wrap{position:relative;height:220px;margin-bottom:4px}
+
+/* POSTS */
+.post-row{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.post-row:last-child{border-bottom:none}
+.post-badge{width:32px;height:32px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.post-text{flex:1;font-size:12px;line-height:1.6}
+.post-meta{display:flex;gap:14px;font-size:11px;color:var(--muted);margin-top:4px}
+.psv{font-weight:500;color:var(--text)}
+.post-date{font-size:10px;color:var(--muted);flex-shrink:0;padding-top:2px}
+
+/* ADS TABLE */
+table.ads{width:100%;border-collapse:collapse}
+.ads thead{background:var(--bg)}
+.ads th{padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border)}
+.ads td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ads tr:last-child td{border-bottom:none}
+.ads tr:hover td{background:var(--bg)}
+.pb{display:flex;align-items:center;gap:8px}
+.pb-track{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px}
+.badge{display:inline-flex;align-items:center;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;border:1px solid transparent}
+.b-green{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border)}
+.b-amber{background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border)}
+
+/* WEBFLOW */
+.wf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.page-tbl{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden}
+.pt-head{display:flex;justify-content:space-between;padding:11px 16px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;font-weight:500}
+.pt-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--border)}
+.pt-row:last-child{border-bottom:none}
+.pt-page{flex:1;font-size:12px;color:var(--muted)}
+.pt-bar-w{width:80px}
+.pt-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.pt-fill{height:100%;border-radius:2px}
+.pt-num{min-width:44px;text-align:right;font-family:'Fraunces',serif;font-size:16px}
+.funnel{border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px}
+.funnel-title{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:16px}
+.fstep{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.fstep:last-child{margin-bottom:0}
+.f-lbl{width:130px;font-size:12px;color:var(--muted);flex-shrink:0}
+.f-bg{flex:1;height:26px;background:var(--bg);border-radius:6px;overflow:hidden}
+.f-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:500;color:#fff}
+.f-num{min-width:48px;text-align:right;font-family:'Fraunces',serif;font-size:15px}
+.f-pct{width:36px;text-align:right;font-size:11px;color:var(--muted)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+#toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:600;display:flex;align-items:center;gap:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.sec-card{animation:fadeUp 0.3s ease both}
+.sec-card:nth-child(2){animation-delay:0.08s}
+.sec-card:nth-child(3){animation-delay:0.16s}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="../../idc-portal/01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="../../idc-portal/02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/></svg>Team</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="../../idc-portal/03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>Client Budgets</a>
+      <a class="nav-item" href="../../idc-portal/03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only" href="01-invoices-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="02-sales-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="role-toggle">
+    <button class="rt-btn" onclick="setRole('employee',this)">Employee</button>
+    <button class="rt-btn active" onclick="setRole('admin',this)">Admin</button>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="uav">JL</div>
+    <div><div class="user-name">Jamie L.</div><div class="user-role" id="rlabel">Admin</div></div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div><h1>Analytics <em>Hub</em></h1><p>Social · Facebook Ads · Webflow · All channels unified</p></div>
+    <div style="display:flex;align-items:center;gap:10px" id="aa">
+      <div class="sync-chip"><div class="sync-dot"></div>Live · 6 min ago</div>
+      <div class="date-tabs">
+        <button class="dt active" onclick="setRange(this)">7D</button>
+        <button class="dt" onclick="setRange(this)">30D</button>
+        <button class="dt" onclick="setRange(this)">90D</button>
+        <button class="dt" onclick="setRange(this)">YTD</button>
+      </div>
+      <button class="btn btn-ghost">↓ Export</button>
+    </div>
+  </div>
+
+  <div class="role-gate" id="rgate" style="display:none">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">Admin access required</div>
+    <div class="gate-body">Analytics data is restricted to admin users only.</div>
+    <div class="gate-badge">Admin only · Analytics</div>
+  </div>
+
+  <div class="admin-content visible" id="ac">
+
+    <!-- ═══ SOCIAL ═══ -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-title-row">
+          <div class="sec-icon" style="background:var(--pink-bg)">📱</div>
+          <div><div class="sec-title">Social media</div><div class="sec-sub">Instagram · LinkedIn · X / Twitter</div></div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:12px">View all posts</button>
+      </div>
+      <div class="sec-body">
+        <div class="plat-grid">
+          <div class="plat ig">
+            <div class="plat-top"><div class="plat-icon" style="background:#E91E8C;color:#fff">📸</div><div><div class="plat-name">Instagram</div><div class="plat-handle">@idcagency</div></div></div>
+            <div class="plat-stats">
+              <div><div class="plat-val" style="color:var(--pink-text)">12.4k</div><div class="plat-lbl">Followers</div></div>
+              <div><div class="plat-val">214</div><div class="plat-lbl">Likes 7d</div></div>
+              <div><div class="plat-val" style="color:var(--pink-text)">4.2%</div><div class="plat-lbl">Eng. rate</div></div>
+            </div>
+          </div>
+          <div class="plat li">
+            <div class="plat-top"><div class="plat-icon" style="background:#0077B5;color:#fff">💼</div><div><div class="plat-name">LinkedIn</div><div class="plat-handle">IDC Agency</div></div></div>
+            <div class="plat-stats">
+              <div><div class="plat-val" style="color:var(--blue-text)">3.8k</div><div class="plat-lbl">Followers</div></div>
+              <div><div class="plat-val">47</div><div class="plat-lbl">React. 7d</div></div>
+              <div><div class="plat-val" style="color:var(--blue-text)">2.8%</div><div class="plat-lbl">Eng. rate</div></div>
+            </div>
+          </div>
+          <div class="plat tw">
+            <div class="plat-top"><div class="plat-icon" style="background:#1DA1F2;color:#fff">🐦</div><div><div class="plat-name">X / Twitter</div><div class="plat-handle">@idcagency</div></div></div>
+            <div class="plat-stats">
+              <div><div class="plat-val" style="color:var(--teal-text)">2.1k</div><div class="plat-lbl">Followers</div></div>
+              <div><div class="plat-val">89</div><div class="plat-lbl">Imp. 7d</div></div>
+              <div><div class="plat-val" style="color:var(--teal-text)">1.4%</div><div class="plat-lbl">Eng. rate</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-label">Engagement over 7 days</div>
+        <div class="chart-wrap"><canvas id="social-chart"></canvas></div>
+        <div class="chart-label" style="margin-top:20px">Recent posts</div>
+        <div class="post-row">
+          <div class="post-badge" style="background:var(--pink-bg)">📸</div>
+          <div style="flex:1"><div class="post-text">Behind the scenes at our Q1 client shoot — so proud of what this team pulled together</div><div class="post-meta"><span><span class="psv">214</span> likes</span><span><span class="psv">18</span> comments</span><span><span class="psv">42</span> shares</span><span style="color:var(--pink-text)">4.8% eng.</span></div></div>
+          <div class="post-date">Mar 27</div>
+        </div>
+        <div class="post-row">
+          <div class="post-badge" style="background:var(--blue-bg)">💼</div>
+          <div style="flex:1"><div class="post-text">We're hiring a senior strategist! If you know someone who'd be a great fit, send them our way.</div><div class="post-meta"><span><span class="psv">47</span> reactions</span><span><span class="psv">12</span> comments</span></div></div>
+          <div class="post-date">Mar 25</div>
+        </div>
+        <div class="post-row">
+          <div class="post-badge" style="background:var(--pink-bg)">📸</div>
+          <div style="flex:1"><div class="post-text">Q1 wrapped — here's a look at what we built this quarter. Thread →</div><div class="post-meta"><span><span class="psv">186</span> likes</span><span><span class="psv">22</span> comments</span><span style="color:var(--pink-text)">3.9% eng.</span></div></div>
+          <div class="post-date">Mar 22</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FACEBOOK ADS ═══ -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-title-row">
+          <div class="sec-icon" style="background:var(--blue-bg)">📣</div>
+          <div><div class="sec-title">Facebook Ads</div><div class="sec-sub">All campaigns · Graph API · Last 30 days</div></div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:12px">Open Ads Manager ↗</button>
+      </div>
+      <div class="sec-body">
+        <div class="sr5">
+          <div class="sc c-blue"><div class="sc-l">Total spend</div><div class="sc-v" style="color:var(--blue-text)">$4,280</div><div class="sc-d">Budget: $5,000</div></div>
+          <div class="sc plain"><div class="sc-l">Impressions</div><div class="sc-v">142k</div><div class="sc-d d-up">↑ 18% vs last mo</div></div>
+          <div class="sc plain"><div class="sc-l">Clicks</div><div class="sc-v">3,840</div><div class="sc-d d-up">↑ 22%</div></div>
+          <div class="sc c-green"><div class="sc-l">CTR</div><div class="sc-v" style="color:var(--green-text)">2.70%</div><div class="sc-d d-up">↑ 0.4pts</div></div>
+          <div class="sc c-teal"><div class="sc-l">Cost per click</div><div class="sc-v" style="color:var(--teal-text)">$1.11</div><div class="sc-d d-up">↓ $0.14</div></div>
+        </div>
+        <div class="chart-label">Daily spend vs clicks</div>
+        <div class="chart-wrap"><canvas id="ads-chart"></canvas></div>
+        <div class="chart-label" style="margin-top:20px">Campaigns</div>
+        <table class="ads">
+          <thead><tr><th>Campaign</th><th>Status</th><th>Spend</th><th>Impressions</th><th>Clicks</th><th>CTR</th><th>CPC</th><th>Score</th></tr></thead>
+          <tbody>
+            <tr><td><div style="font-weight:500">Q2 Lead Gen — Design</div><div style="font-size:11px;color:var(--muted)">Awareness + conversion</div></td><td><span class="badge b-green">Active</span></td><td style="font-family:'Fraunces',serif;font-size:16px">$1,840</td><td style="color:var(--muted)">62,400</td><td>1,680</td><td style="color:var(--accent-green);font-weight:500">2.69%</td><td>$1.10</td><td><div class="pb"><div class="pb-track"><div class="pb-fill" style="width:82%;background:var(--accent-green)"></div></div><span style="font-size:11px;color:var(--accent-green);font-weight:500">82</span></div></td></tr>
+            <tr><td><div style="font-weight:500">Retargeting — Proposal</div><div style="font-size:11px;color:var(--muted)">Warm audience</div></td><td><span class="badge b-green">Active</span></td><td style="font-family:'Fraunces',serif;font-size:16px">$960</td><td style="color:var(--muted)">28,100</td><td>980</td><td style="color:var(--accent-green);font-weight:500">3.49%</td><td>$0.98</td><td><div class="pb"><div class="pb-track"><div class="pb-fill" style="width:91%;background:var(--accent-green)"></div></div><span style="font-size:11px;color:var(--accent-green);font-weight:500">91</span></div></td></tr>
+            <tr><td><div style="font-weight:500">Brand Awareness — Social</div><div style="font-size:11px;color:var(--muted)">Broad audience</div></td><td><span class="badge b-amber">Paused</span></td><td style="font-family:'Fraunces',serif;font-size:16px">$820</td><td style="color:var(--muted)">36,200</td><td>740</td><td style="color:var(--accent-amber);font-weight:500">2.04%</td><td>$1.11</td><td><div class="pb"><div class="pb-track"><div class="pb-fill" style="width:54%;background:var(--accent-amber)"></div></div><span style="font-size:11px;color:var(--accent-amber);font-weight:500">54</span></div></td></tr>
+            <tr><td><div style="font-weight:500">Video Views — Case Study</div><div style="font-size:11px;color:var(--muted)">Video engagement</div></td><td><span class="badge b-green">Active</span></td><td style="font-family:'Fraunces',serif;font-size:16px">$660</td><td style="color:var(--muted)">15,800</td><td>440</td><td style="color:var(--accent-blue);font-weight:500">2.78%</td><td>$1.50</td><td><div class="pb"><div class="pb-track"><div class="pb-fill" style="width:67%;background:var(--accent-blue)"></div></div><span style="font-size:11px;color:var(--accent-blue);font-weight:500">67</span></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ WEBFLOW ═══ -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-title-row">
+          <div class="sec-icon" style="background:var(--teal-bg)">🌐</div>
+          <div><div class="sec-title">Webflow analytics</div><div class="sec-sub">Landing page + website · Last 30 days</div></div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:12px">Open Webflow ↗</button>
+      </div>
+      <div class="sec-body">
+        <div class="sr4">
+          <div class="sc c-teal"><div class="sc-l">Total visitors</div><div class="sc-v" style="color:var(--teal-text)">8,240</div><div class="sc-d d-up">↑ 14%</div></div>
+          <div class="sc plain"><div class="sc-l">Unique sessions</div><div class="sc-v">6,180</div><div class="sc-d d-up">↑ 11%</div></div>
+          <div class="sc plain"><div class="sc-l">Avg time on page</div><div class="sc-v">2:34</div><div class="sc-d d-up">↑ 18s</div></div>
+          <div class="sc c-green"><div class="sc-l">Form conversion</div><div class="sc-v" style="color:var(--green-text)">3.2%</div><div class="sc-d d-up">↑ 0.6pts</div></div>
+        </div>
+        <div class="wf-grid">
+          <div class="page-tbl">
+            <div class="pt-head"><span>Top pages</span><span style="color:var(--muted)">By views (30d)</span></div>
+            <div class="pt-row"><div class="pt-page">/home</div><div class="pt-bar-w"><div class="pt-track"><div class="pt-fill" style="width:100%;background:var(--accent-blue)"></div></div></div><div class="pt-num" style="color:var(--accent-blue)">3,840</div></div>
+            <div class="pt-row"><div class="pt-page">/services</div><div class="pt-bar-w"><div class="pt-track"><div class="pt-fill" style="width:70%;background:var(--accent-blue)"></div></div></div><div class="pt-num">2,680</div></div>
+            <div class="pt-row"><div class="pt-page">/work</div><div class="pt-bar-w"><div class="pt-track"><div class="pt-fill" style="width:52%;background:var(--accent-purple)"></div></div></div><div class="pt-num">1,990</div></div>
+            <div class="pt-row"><div class="pt-page">/lp/q2-2026</div><div class="pt-bar-w"><div class="pt-track"><div class="pt-fill" style="width:28%;background:var(--accent-amber)"></div></div></div><div class="pt-num" style="color:var(--amber-text)">1,080</div></div>
+            <div class="pt-row"><div class="pt-page">/about</div><div class="pt-bar-w"><div class="pt-track"><div class="pt-fill" style="width:34%;background:var(--accent-blue)"></div></div></div><div class="pt-num">1,310</div></div>
+            <div class="pt-row"><div class="pt-page">/contact</div><div class="pt-bar-w"><div class="pt-track"><div class="pt-fill" style="width:22%;background:var(--accent-green)"></div></div></div><div class="pt-num" style="color:var(--green-text)">840</div></div>
+          </div>
+          <div class="funnel">
+            <div class="funnel-title">Conversion funnel</div>
+            <div class="fstep"><div class="f-lbl">Visitors</div><div class="f-bg"><div class="f-fill" style="width:100%;background:var(--accent-blue)">6,180</div></div><div class="f-num">6,180</div><div class="f-pct">100%</div></div>
+            <div class="fstep"><div class="f-lbl">Viewed /services</div><div class="f-bg"><div class="f-fill" style="width:43%;background:var(--accent-blue)">2,660</div></div><div class="f-num">2,660</div><div class="f-pct">43%</div></div>
+            <div class="fstep"><div class="f-lbl">Viewed /work</div><div class="f-bg"><div class="f-fill" style="width:22%;background:var(--accent-purple)">1,380</div></div><div class="f-num">1,380</div><div class="f-pct">22%</div></div>
+            <div class="fstep"><div class="f-lbl">Reached /contact</div><div class="f-bg"><div class="f-fill" style="width:14%;background:var(--accent-amber)">840</div></div><div class="f-num">840</div><div class="f-pct">14%</div></div>
+            <div class="fstep"><div class="f-lbl">Form submitted</div><div class="f-bg"><div class="f-fill" style="width:100%;min-width:50px;background:var(--accent-green)">198</div></div><div class="f-num" style="color:var(--green-text)">198</div><div class="f-pct" style="color:var(--green-text)">3.2%</div></div>
+          </div>
+        </div>
+        <div class="chart-label" style="margin-top:20px">Traffic sources</div>
+        <div style="height:240px;position:relative"><canvas id="traffic-chart"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div id="toast"></div>
+<script>
+function setRole(r,btn){
+  document.querySelectorAll('.rt-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('rlabel').textContent=r==='admin'?'Admin':'Employee';
+  document.getElementById('rgate').style.display=r==='employee'?'block':'none';
+  const ac=document.getElementById('ac');const aa=document.getElementById('aa');
+  if(r==='employee'){ac.classList.remove('visible');aa.style.display='none';}
+  else{ac.classList.add('visible');aa.style.display='flex';}
+  document.getElementById('uav').style.background=r==='admin'?'linear-gradient(135deg,#F0A500,#E85D4A)':'linear-gradient(135deg,#3B6FE8,#7C5CBF)';
+}
+function setRange(el){document.querySelectorAll('.dt').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function showToast(m,i='✓'){const t=document.getElementById('toast');t.innerHTML=`<span style="font-size:16px">${i}</span>${m}`;t.style.transform='translateY(0)';t.style.opacity='1';setTimeout(()=>{t.style.transform='translateY(80px)';t.style.opacity='0';},3000);}
+
+const OPTS={responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{family:'DM Sans',size:11},color:'#7A7A8C',boxWidth:10,padding:14}},tooltip:{backgroundColor:'#1C1C2E',titleColor:'#fff',bodyColor:'rgba(255,255,255,0.7)',padding:10,cornerRadius:8}},scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'#7A7A8C'}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'DM Sans',size:11},color:'#7A7A8C'}}}};
+const LBL=['Mar 24','Mar 25','Mar 26','Mar 27','Mar 28','Mar 29','Mar 30'];
+
+new Chart(document.getElementById('social-chart'),{type:'line',data:{labels:LBL,datasets:[{label:'Instagram',data:[38,52,44,61,48,54,62],borderColor:'#D4005A',backgroundColor:'rgba(212,0,90,0.06)',tension:0.4,pointRadius:3,pointBackgroundColor:'#D4005A',fill:true},{label:'LinkedIn',data:[12,18,14,22,16,20,24],borderColor:'#3B6FE8',backgroundColor:'rgba(59,111,232,0.06)',tension:0.4,pointRadius:3,pointBackgroundColor:'#3B6FE8',fill:true},{label:'X',data:[8,14,10,16,12,18,20],borderColor:'#2DAE7F',backgroundColor:'rgba(45,174,127,0.04)',tension:0.4,pointRadius:3,pointBackgroundColor:'#2DAE7F',fill:true}]},options:{...OPTS}});
+
+new Chart(document.getElementById('ads-chart'),{type:'bar',data:{labels:LBL,datasets:[{label:'Spend ($)',data:[180,220,195,240,210,185,195],backgroundColor:'rgba(59,111,232,0.12)',borderColor:'#3B6FE8',borderWidth:1.5,borderRadius:4,yAxisID:'y'},{label:'Clicks',data:[160,198,172,218,190,168,174],type:'line',borderColor:'#2DAE7F',backgroundColor:'rgba(45,174,127,0.06)',tension:0.4,pointRadius:3,pointBackgroundColor:'#2DAE7F',yAxisID:'y1',fill:true}]},options:{...OPTS,scales:{x:{grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'#7A7A8C'}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{family:'DM Sans',size:11},color:'#7A7A8C'},position:'left'},y1:{position:'right',grid:{display:false},ticks:{font:{family:'DM Sans',size:11},color:'#2DAE7F'}}}}});
+
+new Chart(document.getElementById('traffic-chart'),{type:'doughnut',data:{labels:['Direct','Organic search','Facebook Ads','Social referral','Email','Other'],datasets:[{data:[28,24,22,14,8,4],backgroundColor:['#3B6FE8','#2DAE7F','#0866FF','#E85D4A','#F0A500','#B0A8A0'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'right',labels:{font:{family:'DM Sans',size:12},color:'#7A7A8C',padding:12,boxWidth:10}},tooltip:{backgroundColor:'#1C1C2E',titleColor:'#fff',bodyColor:'rgba(255,255,255,0.7)',padding:10,cornerRadius:8}}}});
+</script>
+</body>
+</html>

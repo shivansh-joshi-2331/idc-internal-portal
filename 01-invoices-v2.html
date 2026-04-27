@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Invoices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+  --blue-bg:#EBF0FD;--blue-border:#C0D0F8;--blue-text:#2850C0;
+  --green-bg:#E8F7F2;--green-border:#A8DEC8;--green-text:#1A7A57;
+  --coral-bg:#FDEDEB;--coral-border:#F5BDB5;--coral-text:#B03020;
+  --amber-bg:#FEF3DC;--amber-border:#F0D490;--amber-text:#A06500;
+  --purple-bg:#F0EDFA;--purple-border:#C8B8F0;--purple-text:#5C3E9A;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;font-weight:400;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.nav-item.admin-only.active{border-left-color:var(--accent-amber)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0A500,#E85D4A);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(240,165,0,0.2);color:var(--accent-amber);border-color:rgba(240,165,0,0.3)}
+.main{margin-left:220px;flex:1;padding:32px;max-width:1100px}
+.page-header{margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--accent-amber)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+.role-gate{background:var(--surface);border-radius:var(--radius);border:2px dashed var(--border);padding:60px 40px;text-align:center}
+.gate-icon{font-size:48px;margin-bottom:16px}
+.gate-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;margin-bottom:8px}
+.gate-body{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 24px;line-height:1.6}
+.gate-badge{display:inline-flex;align-items:center;gap:6px;background:var(--amber-bg);color:var(--amber-text);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;border:1px solid var(--amber-border)}
+.admin-content{display:none}
+.admin-content.visible{display:block;animation:fadeUp 0.3s ease}
+.sync-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 18px;margin-bottom:20px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-green);flex-shrink:0;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(45,174,127,0.15)}50%{box-shadow:0 0 0 6px rgba(45,174,127,0.07)}}
+.sync-text{flex:1;font-size:12px;color:var(--muted)}
+.sync-text strong{color:var(--text)}
+.overdue-banner{background:var(--coral-bg);border:1px solid var(--coral-border);border-left:4px solid var(--accent-coral);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+.ob-title{font-size:14px;font-weight:600;color:var(--coral-text);margin-bottom:3px}
+.ob-body{font-size:12px;color:var(--muted)}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{border-radius:var(--radius);padding:20px;border:1px solid;position:relative;overflow:hidden;transition:transform 0.15s,box-shadow 0.15s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,0.07)}
+.stat-card .accent-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.c-blue{background:var(--blue-bg);border-color:var(--blue-border)}
+.stat-card.c-coral{background:var(--coral-bg);border-color:var(--coral-border)}
+.stat-card.c-green{background:var(--green-bg);border-color:var(--green-border)}
+.stat-card.c-amber{background:var(--amber-bg);border-color:var(--amber-border)}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px}
+.stat-value{font-family:'Fraunces',serif;font-size:28px;font-weight:600;letter-spacing:-1px;line-height:1}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:6px}
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.filter-tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s}
+.filter-tab.active{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue)}
+.filter-tab.ov.active{background:var(--accent-coral);border-color:var(--accent-coral)}
+.search-input{flex:1;max-width:280px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;outline:none}
+.search-input:focus{border-color:var(--accent-blue)}
+.filter-select{padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;cursor:pointer}
+.table-wrap{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg)}
+th{padding:12px 16px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:13px 16px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF8}
+tr.ov-row td{background:rgba(232,93,74,0.025)}
+tr.ov-row{border-left:3px solid var(--accent-coral)}
+tr.ov-row:hover td{background:rgba(232,93,74,0.05)}
+.cn{font-weight:600}
+.cs{font-size:11px;color:var(--muted);margin-top:1px}
+.inv-num{font-size:12px;color:var(--accent-blue);cursor:pointer;font-weight:500}
+.inv-num:hover{text-decoration:underline}
+.amt{font-weight:600;font-size:15px}
+.amt-ov{color:var(--accent-coral)}
+.amt-ok{color:var(--accent-green)}
+.due-ov{color:var(--accent-coral);font-weight:500;font-size:12px}
+.days-pill{font-size:10px;color:var(--coral-text);background:var(--coral-bg);border:1px solid var(--coral-border);padding:2px 7px;border-radius:4px;margin-top:3px;display:inline-block}
+.badge{display:inline-flex;align-items:center;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:500;border:1px solid transparent}
+.b-coral{background:var(--coral-bg);color:var(--coral-text);border-color:var(--coral-border)}
+.b-amber{background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border)}
+.b-green{background:var(--green-bg);color:var(--green-text);border-color:var(--green-border)}
+.b-blue{background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border)}
+.b-gray{background:var(--bg);color:var(--muted);border-color:var(--border)}
+.b-purple{background:var(--purple-bg);color:var(--purple-text);border-color:var(--purple-border)}
+.asana-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#B85000;background:#FFF0E6;border:1px solid #F0C898;border-radius:4px;padding:3px 7px;font-weight:500}
+.act-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s;margin-right:4px;font-family:inherit}
+.act-btn:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
+.btn-primary{background:var(--accent-blue);color:#fff}
+.btn-primary:hover{background:#2A5ED4}
+.btn-amber{background:var(--accent-amber);color:#fff}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.sec-div{display:flex;align-items:center;gap:16px;margin:32px 0 20px}
+.sec-div h2{font-family:'Fraunces',serif;font-size:22px;font-weight:300;font-style:italic;white-space:nowrap}
+.div-line{flex:1;height:1px;background:var(--border)}
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.4);backdrop-filter:blur(3px);z-index:200}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;right:-460px;width:440px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;padding:28px;overflow-y:auto;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.08)}
+.drawer.open{right:0}
+.drawer-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);margin-bottom:20px}
+.drawer-close:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.drawer-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:3px}
+.drawer-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
+.drow:last-child{border-bottom:none}
+.dl{font-size:12px;color:var(--muted)}
+.dv{font-size:13px;font-weight:500}
+.tl-item{display:flex;gap:12px;margin-bottom:12px}
+.tl-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.tl-text{font-size:12px;line-height:1.6}
+.tl-date{font-size:10px;color:var(--muted);margin-top:2px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.5);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);padding:28px;width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;animation:modalIn 0.25s cubic-bezier(0.34,1.4,0.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(0.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.form-row{margin-bottom:14px}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none;transition:border-color 0.15s}
+.form-input:focus,.form-select:focus{border-color:var(--accent-blue)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.btn-cancel{padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer}
+#toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:600;display:flex;align-items:center;gap:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.stat-card,.table-wrap{animation:fadeUp 0.3s ease both}
+.stat-card:nth-child(2){animation-delay:.05s}
+.stat-card:nth-child(3){animation-delay:.1s}
+.stat-card:nth-child(4){animation-delay:.15s}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="../../idc-portal/01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="../../idc-portal/02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/><path d="M11 7c2 0 4 1 4 4"/><circle cx="12" cy="3.5" r="2"/></svg>Team</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="../../idc-portal/03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M4 9h2M7 9h2M10 9h2"/></svg>Client Budgets</a>
+      <a class="nav-item" href="../../idc-portal/03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="02-sales-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="03-analytics-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="role-toggle">
+    <button class="rt-btn" onclick="setRole('employee',this)">Employee</button>
+    <button class="rt-btn active" onclick="setRole('admin',this)">Admin</button>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="uav">JL</div>
+    <div><div class="user-name">Jamie L.</div><div class="user-role" id="rlabel">Admin</div></div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div><h1>Invoice <em>Tracker</em></h1><p>Stripe-synced · Live invoice status · Overdue alerts</p></div>
+    <div style="display:flex;gap:10px" id="aa">
+      <button class="btn btn-ghost" onclick="showToast('Stripe synced · 24 invoices updated','⟳')">⟳ Sync Stripe</button>
+      <button class="btn btn-primary" onclick="document.getElementById('add-modal').classList.add('open')">+ Add invoice</button>
+    </div>
+  </div>
+
+  <div class="role-gate" id="rgate" style="display:none">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">Admin access required</div>
+    <div class="gate-body">Invoice and billing data is restricted to admin users only.</div>
+    <div class="gate-badge">Admin only · Finance</div>
+  </div>
+
+  <div class="admin-content visible" id="ac">
+
+    <div class="sync-bar">
+      <div class="sync-dot"></div>
+      <div class="sync-text"><strong>Stripe connected</strong> · Last synced 4 minutes ago · 24 invoices tracked</div>
+      <button class="act-btn" onclick="showToast('Stripe synced','⟳')">⟳ Sync now</button>
+    </div>
+
+    <div class="overdue-banner">
+      <div style="font-size:22px;flex-shrink:0">⚠️</div>
+      <div style="flex:1">
+        <div class="ob-title">3 overdue invoices · $14,750 outstanding</div>
+        <div class="ob-body">Asana tasks auto-created for Acme Corp and Bright Digital. Nova Ventures task pending.</div>
+      </div>
+      <button class="btn btn-amber" onclick="showToast('3 Asana reminder tasks created','📋')">Create Asana tasks</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card c-blue"><div class="accent-bar" style="background:var(--accent-blue)"></div><div class="stat-label">Total outstanding</div><div class="stat-value" style="color:var(--blue-text)">$42,800</div><div class="stat-sub">8 open invoices</div></div>
+      <div class="stat-card c-coral"><div class="accent-bar" style="background:var(--accent-coral)"></div><div class="stat-label">Overdue</div><div class="stat-value" style="color:var(--coral-text)">$14,750</div><div class="stat-sub">3 past due</div></div>
+      <div class="stat-card c-green"><div class="accent-bar" style="background:var(--accent-green)"></div><div class="stat-label">Collected MTD</div><div class="stat-value" style="color:var(--green-text)">$38,400</div><div class="stat-sub">↑ 12% vs last month</div></div>
+      <div class="stat-card c-amber"><div class="accent-bar" style="background:var(--accent-amber)"></div><div class="stat-label">Avg days to pay</div><div class="stat-value" style="color:var(--amber-text)">18</div><div class="stat-sub">Net-30 standard</div></div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="filter-tab active" onclick="filt('all',this)">All</div>
+      <div class="filter-tab ov" onclick="filt('overdue',this)">Overdue <span style="background:var(--accent-coral);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:3px">3</span></div>
+      <div class="filter-tab" onclick="filt('pending',this)">Pending</div>
+      <div class="filter-tab" onclick="filt('paid',this)">Paid</div>
+      <input class="search-input" placeholder="Search client or invoice #..." oninput="search(this.value)"/>
+      <select class="filter-select" style="margin-left:auto"><option>All clients</option><option>Acme Corp</option><option>Bright Digital</option><option>Nova Ventures</option><option>Solis Health</option></select>
+    </div>
+
+    <div class="table-wrap">
+      <table id="inv-t">
+        <thead><tr><th>Invoice #</th><th>Client</th><th>Amount</th><th>Issued</th><th>Due / Status</th><th>Badge</th><th>Asana</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr class="ov-row" data-s="overdue"><td><div class="inv-num" onclick="openD('INV-2026-041','Acme Corp','$8,500')">INV-2026-041</div></td><td><div class="cn">Acme Corp</div><div class="cs">Enterprise retainer</div></td><td><div class="amt amt-ov">$8,500</div></td><td style="font-size:12px;color:var(--muted)">Feb 28</td><td><div class="due-ov">Mar 1</div><div class="days-pill">29 days over</div></td><td><span class="badge b-coral">Overdue</span></td><td><span class="asana-tag">✓ Task #142398</span></td><td><button class="act-btn" onclick="showToast('Marked paid','✓')">Mark paid</button><button class="act-btn" onclick="showToast('Reminder sent','📧')">Remind</button></td></tr>
+          <tr class="ov-row" data-s="overdue"><td><div class="inv-num" onclick="openD('INV-2026-038','Bright Digital','$3,200')">INV-2026-038</div></td><td><div class="cn">Bright Digital</div><div class="cs">Growth monthly</div></td><td><div class="amt amt-ov">$3,200</div></td><td style="font-size:12px;color:var(--muted)">Feb 15</td><td><div class="due-ov">Mar 15</div><div class="days-pill">15 days over</div></td><td><span class="badge b-coral">Overdue</span></td><td><span class="asana-tag">✓ Task #142401</span></td><td><button class="act-btn" onclick="showToast('Marked paid','✓')">Mark paid</button><button class="act-btn" onclick="showToast('Reminder sent','📧')">Remind</button></td></tr>
+          <tr class="ov-row" data-s="overdue"><td><div class="inv-num" onclick="openD('INV-2026-035','Nova Ventures','$3,050')">INV-2026-035</div></td><td><div class="cn">Nova Ventures</div><div class="cs">Enterprise retainer</div></td><td><div class="amt amt-ov">$3,050</div></td><td style="font-size:12px;color:var(--muted)">Feb 28</td><td><div class="due-ov">Mar 28</div><div class="days-pill">2 days over</div></td><td><span class="badge b-coral">Overdue</span></td><td><button class="act-btn" onclick="showToast('Asana task created','📋')">+ Create task</button></td><td><button class="act-btn" onclick="showToast('Marked paid','✓')">Mark paid</button></td></tr>
+          <tr data-s="pending"><td><div class="inv-num" onclick="openD('INV-2026-044','Solis Health','$5,750')">INV-2026-044</div></td><td><div class="cn">Solis Health</div><div class="cs">Project milestone</div></td><td><div class="amt">$5,750</div></td><td style="font-size:12px;color:var(--muted)">Mar 15</td><td style="font-size:12px;color:var(--muted)">Apr 14</td><td><span class="badge b-amber">Pending</span></td><td>—</td><td><button class="act-btn" onclick="showToast('Marked paid','✓')">Mark paid</button></td></tr>
+          <tr data-s="pending"><td><div class="inv-num">INV-2026-043</div></td><td><div class="cn">Meridian Co.</div><div class="cs">Monthly retainer</div></td><td><div class="amt">$2,800</div></td><td style="font-size:12px;color:var(--muted)">Mar 20</td><td style="font-size:12px;color:var(--muted)">Apr 19</td><td><span class="badge b-blue">Sent</span></td><td>—</td><td><button class="act-btn">Mark paid</button></td></tr>
+          <tr data-s="paid"><td><div class="inv-num" onclick="openD('INV-2026-032','Nova Ventures','$12,000')">INV-2026-032</div></td><td><div class="cn">Nova Ventures</div><div class="cs">Enterprise retainer</div></td><td><div class="amt amt-ok">$12,000</div></td><td style="font-size:12px;color:var(--muted)">Jan 31</td><td style="font-size:12px;color:var(--muted)">Mar 2</td><td><span class="badge b-green">✓ Paid</span></td><td>—</td><td><button class="act-btn">Receipt</button></td></tr>
+          <tr data-s="paid"><td><div class="inv-num">INV-2026-029</div></td><td><div class="cn">Bright Digital</div><div class="cs">Growth monthly</div></td><td><div class="amt amt-ok">$3,200</div></td><td style="font-size:12px;color:var(--muted)">Jan 15</td><td style="font-size:12px;color:var(--muted)">Feb 14</td><td><span class="badge b-green">✓ Paid</span></td><td>—</td><td><button class="act-btn">Receipt</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sec-div"><h2>Expense tracker</h2><div class="div-line"></div><div style="display:flex;gap:8px;flex-shrink:0"><button class="btn btn-ghost" onclick="showToast('Upwork pulled · 3 new','↓')">↓ Pull Upwork</button><button class="btn btn-ghost" onclick="showToast('Monarch sync started','↓')">↓ Pull Monarch</button><button class="btn btn-primary" onclick="document.getElementById('exp-modal').classList.add('open')">+ Add expense</button></div></div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Client</th><th>Category</th><th>Description</th><th>Source</th><th>Amount</th><th></th></tr></thead>
+        <tbody>
+          <tr><td style="font-size:12px;color:var(--muted)">Mar 28</td><td><div class="cn">Acme Corp</div></td><td><span class="badge b-blue" style="font-size:10px">Freelancer</span></td><td style="font-size:12px">Design sprint · 12h @ $75</td><td><span class="badge b-gray" style="font-size:10px">Upwork</span></td><td><strong>$900</strong></td><td><button class="act-btn">Edit</button></td></tr>
+          <tr><td style="font-size:12px;color:var(--muted)">Mar 25</td><td><div class="cn">Nova Ventures</div></td><td><span class="badge b-green" style="font-size:10px">Software</span></td><td style="font-size:12px">Figma seats · Monthly</td><td><span class="badge b-gray" style="font-size:10px">Monarch</span></td><td><strong>$45</strong></td><td><button class="act-btn">Edit</button></td></tr>
+          <tr><td style="font-size:12px;color:var(--muted)">Mar 22</td><td><div class="cn">Bright Digital</div></td><td><span class="badge b-blue" style="font-size:10px">Freelancer</span></td><td style="font-size:12px">Video edit · 8h @ $60</td><td><span class="badge b-gray" style="font-size:10px">Upwork</span></td><td><strong>$480</strong></td><td><button class="act-btn">Edit</button></td></tr>
+          <tr><td style="font-size:12px;color:var(--muted)">Mar 18</td><td><div class="cn">Solis Health</div></td><td><span class="badge b-amber" style="font-size:10px">Ad spend</span></td><td style="font-size:12px">Facebook Ads · March</td><td><span class="badge b-gray" style="font-size:10px">Manual</span></td><td><strong>$1,200</strong></td><td><button class="act-btn">Edit</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="dov" onclick="closeD()"></div>
+<div class="drawer" id="drw">
+  <button class="drawer-close" onclick="closeD()">✕</button>
+  <div class="drawer-title" id="d-n">INV-2026-041</div>
+  <div class="drawer-sub" id="d-c">Acme Corp · Invoice detail</div>
+  <div style="margin-bottom:20px"><span class="badge b-coral">Overdue · 29 days</span></div>
+  <div class="drow"><span class="dl">Amount</span><span class="dv" id="d-a" style="font-family:'Fraunces',serif;font-size:20px;color:var(--accent-coral)">$8,500</span></div>
+  <div class="drow"><span class="dl">Stripe ID</span><span class="dv" style="font-size:12px;color:var(--accent-blue)">in_1OxK2HLK...</span></div>
+  <div class="drow"><span class="dl">Issued</span><span class="dv">Feb 28, 2026</span></div>
+  <div class="drow"><span class="dl">Due date</span><span class="dv">Mar 1, 2026</span></div>
+  <div class="drow"><span class="dl">Terms</span><span class="dv">Net-30</span></div>
+  <div class="drow"><span class="dl">Contact</span><span class="dv" style="font-size:12px">billing@acmecorp.com</span></div>
+  <div class="drow"><span class="dl">Asana task</span><span class="asana-tag">✓ Task #142398</span></div>
+  <div style="margin-top:20px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px">Activity</div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent-coral)"></div><div><div class="tl-text">Asana reminder task auto-created</div><div class="tl-date">Mar 15, 2026</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent-amber)"></div><div><div class="tl-text">Invoice emailed to billing contact</div><div class="tl-date">Feb 28, 2026</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent-blue)"></div><div><div class="tl-text">Invoice created in Stripe</div><div class="tl-date">Feb 28, 2026</div></div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:24px">
+    <button class="btn btn-primary" style="flex:1" onclick="showToast('Marked paid','✓');closeD()">Mark as paid</button>
+    <button class="btn btn-ghost" onclick="showToast('Reminder sent','📧')">Send reminder</button>
+  </div>
+</div>
+
+<!-- ADD INVOICE MODAL -->
+<div class="modal-overlay" id="add-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-title">New invoice</div><div class="modal-sub">Syncs to Stripe automatically</div>
+    <div class="form-row"><label class="form-label">Client</label><select class="form-select"><option>Acme Corp</option><option>Bright Digital</option><option>Nova Ventures</option><option>Solis Health</option></select></div>
+    <div class="form-row"><label class="form-label">Amount ($)</label><input class="form-input" type="number" placeholder="0.00"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-row"><label class="form-label">Issue date</label><input class="form-input" type="date" value="2026-03-30"/></div>
+      <div class="form-row"><label class="form-label">Due date</label><input class="form-input" type="date" value="2026-04-29"/></div>
+    </div>
+    <div class="form-row"><label class="form-label">Description</label><input class="form-input" placeholder="e.g. Monthly retainer · April 2026"/></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="this.closest('.modal-overlay').classList.remove('open')">Cancel</button><button class="btn btn-primary" onclick="this.closest('.modal-overlay').classList.remove('open');showToast('Invoice created and synced','✓')">Create + sync to Stripe</button></div>
+  </div>
+</div>
+
+<!-- EXPENSE MODAL -->
+<div class="modal-overlay" id="exp-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-title">Add expense</div><div class="modal-sub">Log a client cost or freelancer expense</div>
+    <div class="form-row"><label class="form-label">Client</label><select class="form-select"><option>Acme Corp</option><option>Bright Digital</option><option>Nova Ventures</option><option>Solis Health</option></select></div>
+    <div class="form-row"><label class="form-label">Category</label><select class="form-select"><option>Freelancer</option><option>Software</option><option>Ad spend</option><option>Travel</option><option>Other</option></select></div>
+    <div class="form-row"><label class="form-label">Amount ($)</label><input class="form-input" type="number" placeholder="0.00"/></div>
+    <div class="form-row"><label class="form-label">Description</label><input class="form-input" placeholder="Brief description..."/></div>
+    <div class="form-row"><label class="form-label">Source</label><select class="form-select"><option>Manual</option><option>Upwork</option><option>Monarch</option></select></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="this.closest('.modal-overlay').classList.remove('open')">Cancel</button><button class="btn btn-primary" onclick="this.closest('.modal-overlay').classList.remove('open');showToast('Expense saved','✓')">Save expense</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>
+function setRole(r,btn){
+  document.querySelectorAll('.rt-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('rlabel').textContent=r==='admin'?'Admin':'Employee';
+  document.getElementById('rgate').style.display=r==='employee'?'block':'none';
+  const ac=document.getElementById('ac');const aa=document.getElementById('aa');
+  if(r==='employee'){ac.classList.remove('visible');aa.style.display='none';}
+  else{ac.classList.add('visible');aa.style.display='flex';}
+  document.getElementById('uav').style.background=r==='admin'?'linear-gradient(135deg,#F0A500,#E85D4A)':'linear-gradient(135deg,#3B6FE8,#7C5CBF)';
+}
+function openD(n,c,a){document.getElementById('d-n').textContent=n;document.getElementById('d-c').textContent=c+' · Invoice detail';document.getElementById('d-a').textContent=a;document.getElementById('drw').classList.add('open');document.getElementById('dov').classList.add('open');}
+function closeD(){document.getElementById('drw').classList.remove('open');document.getElementById('dov').classList.remove('open');}
+function filt(s,el){document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');document.querySelectorAll('#inv-t tbody tr').forEach(r=>{r.style.display=(s==='all'||r.dataset.s===s)?'':'none';});}
+function search(q){document.querySelectorAll('#inv-t tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none';});}
+function showToast(m,i='✓'){const t=document.getElementById('toast');t.innerHTML=`<span style="font-size:16px">${i}</span>${m}`;t.style.transform='translateY(0)';t.style.opacity='1';setTimeout(()=>{t.style.transform='translateY(80px)';t.style.opacity='0';},3000);}
+</script>
+</body>
+</html>

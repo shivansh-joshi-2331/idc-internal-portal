@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Hiring</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.nav-item.admin-only.active{border-left-color:var(--accent-amber)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto;letter-spacing:0.06em}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0A500,#E85D4A);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(240,165,0,0.2);color:var(--accent-amber);border-color:rgba(240,165,0,0.3)}
+.main{margin-left:220px;flex:1;padding:32px;overflow-x:auto}
+.page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--accent-purple)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+.role-gate{background:var(--surface);border-radius:var(--radius);border:2px dashed var(--border);padding:60px 40px;text-align:center;max-width:600px}
+.gate-icon{font-size:48px;margin-bottom:16px}
+.gate-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;margin-bottom:8px}
+.gate-body{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 24px;line-height:1.6}
+.gate-badge{display:inline-flex;align-items:center;gap:6px;background:#FEF3DC;color:#A06500;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;border:1px solid #F0D490}
+.admin-content{display:none}
+.admin-content.visible{display:block}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:18px;border:1px solid var(--border);position:relative;overflow:hidden}
+.stat-card .accent-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px}
+.stat-value{font-family:'Fraunces',serif;font-size:26px;font-weight:600;letter-spacing:-1px;line-height:1}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* CONTROLS */
+.controls{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.role-filter{display:flex;gap:6px}
+.rf-btn{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s;font-family:inherit}
+.rf-btn.active{background:var(--accent-purple);color:#fff;border-color:var(--accent-purple)}
+
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:repeat(6,minmax(210px,1fr));gap:10px;min-width:1100px}
+.k-col{background:var(--bg);border-radius:var(--radius);padding:12px;min-height:440px;border:1px solid var(--border)}
+.k-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.k-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)}
+.k-count{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--surface);color:var(--muted);border:1px solid var(--border);font-weight:500}
+
+/* CANDIDATE CARD */
+.ccard{background:var(--surface);border-radius:var(--radius-sm);padding:13px;margin-bottom:8px;border:1px solid var(--border);cursor:pointer;transition:all 0.18s;position:relative}
+.ccard:hover{border-color:#C8C0B0;box-shadow:0 2px 12px rgba(0,0,0,0.06);transform:translateY(-1px)}
+.ccard.priority{border-left:3px solid var(--accent-amber);padding-left:10px}
+.cc-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.cc-role{font-size:10px;color:var(--muted);margin-bottom:8px}
+.cc-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px}
+.cc-tag{font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;background:var(--bg);border:1px solid var(--border);color:var(--muted)}
+.cc-tag.highlighted{background:#EBF0FD;color:#2850C0;border-color:#C0D0F8}
+.cc-bottom{display:flex;align-items:center;justify-content:space-between}
+.cc-src{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px}
+.cc-date{font-size:10px;color:var(--muted)}
+.sheet-pip{position:absolute;top:10px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--accent-green);title:Google Sheets synced}
+.priority-star{position:absolute;top:10px;right:20px;font-size:11px;color:var(--accent-amber)}
+
+/* DRAWER */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.4);backdrop-filter:blur(3px);z-index:200}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;right:-480px;width:460px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;padding:28px;overflow-y:auto;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.08)}
+.drawer.open{right:0}
+.drawer-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);margin-bottom:20px}
+.drawer-close:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.drawer-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:3px}
+.drawer-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.stage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 20px}
+.sg{padding:8px 4px;border-radius:var(--radius-sm);border:1px solid var(--border);font-size:11px;font-weight:500;cursor:pointer;text-align:center;background:transparent;transition:all 0.15s;font-family:inherit;color:var(--muted)}
+.sg:hover{border-color:#C8C0B0;color:var(--text)}
+.sg.active{background:#EBF0FD;color:#2850C0;border-color:#C0D0F8}
+.drow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.drow:last-child{border-bottom:none}
+.dl{font-size:12px;color:var(--muted)}
+.dv{font-size:13px;font-weight:500}
+.notes-ta{width:100%;height:80px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;resize:vertical;outline:none;background:var(--surface);color:var(--text);margin-top:8px}
+.notes-ta:focus{border-color:var(--accent-blue)}
+.tl-item{display:flex;gap:12px;margin-bottom:12px}
+.tl-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.tl-text{font-size:12px;line-height:1.6}
+.tl-date{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.5);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);padding:28px;width:460px;box-shadow:0 20px 60px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;animation:modalIn 0.25s cubic-bezier(0.34,1.4,0.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(0.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.form-row{margin-bottom:14px}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none}
+.form-input:focus,.form-select:focus{border-color:var(--accent-blue)}
+.sheet-info{background:#E8F7F2;border:1px solid #A8DEC8;border-radius:var(--radius-sm);padding:12px;font-size:12px;color:#1A7A57;margin-top:14px;display:flex;gap:8px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.btn-cancel{padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s}
+.btn-primary{background:var(--accent-purple);color:#fff}
+.btn-primary:hover{background:#5C3E9A}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.badge{display:inline-flex;align-items:center;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;border:1px solid transparent}
+.b-purple{background:#F0EDFA;color:#5C3E9A;border-color:#C8B8F0}
+.b-blue{background:#EBF0FD;color:#2850C0;border-color:#C0D0F8}
+.b-amber{background:#FEF3DC;color:#A06500;border-color:#F0D490}
+.b-green{background:#E8F7F2;color:#1A7A57;border-color:#A8DEC8}
+.b-coral{background:#FDEDEB;color:#B03020;border-color:#F5BDB5}
+.act-btn{display:inline-flex;align-items:center;padding:5px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s;font-family:inherit}
+.act-btn:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+#toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:600;display:flex;align-items:center;gap:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="03-team.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/></svg>Team</a>
+      <a class="nav-item" href="04-leaderboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+      <a class="nav-item" href="05-handbook.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h4M5 8h4M5 11h2"/></svg>Handbook</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>Client Budgets</a>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+      <a class="nav-item" href="06-partners.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l4-4 4 4 4-4"/></svg>Partners</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only" href="admin/01-invoices.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/02-sales-pipeline.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/03-analytics.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/><path d="M11 3l2 2-2 2"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="role-toggle">
+    <button class="rt-btn" onclick="setRole('employee',this)">Employee</button>
+    <button class="rt-btn active" onclick="setRole('admin',this)">Admin</button>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="uav">JL</div>
+    <div><div class="user-name">Jamie L.</div><div class="user-role" id="rlabel">Admin</div></div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div><h1>Hiring <em>Pipeline</em></h1><p>Candidate tracking · Google Sheets sync · Role-based views</p></div>
+    <div style="display:flex;gap:10px" id="aa">
+      <button class="btn btn-ghost" onclick="showToast('Google Sheets synced · 18 candidates','📊')">↓ Sync Sheets</button>
+      <button class="btn btn-primary" onclick="document.getElementById('add-modal').classList.add('open')">+ Add candidate</button>
+    </div>
+  </div>
+
+  <div class="role-gate" id="rgate" style="display:none">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">Admin access required</div>
+    <div class="gate-body">Candidate data and hiring pipeline are restricted to admin users only.</div>
+    <div class="gate-badge">Admin only · HR</div>
+  </div>
+
+  <div class="admin-content visible" id="ac">
+    <div class="stats-row">
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-purple)"></div><div class="stat-label">Active candidates</div><div class="stat-value" style="color:var(--accent-purple)">18</div><div class="stat-sub">4 open roles</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-amber)"></div><div class="stat-label">Interviews this week</div><div class="stat-value" style="color:var(--accent-amber)">6</div><div class="stat-sub">3 first-round</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-blue)"></div><div class="stat-label">Offers out</div><div class="stat-value" style="color:var(--accent-blue)">2</div><div class="stat-sub">Awaiting response</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-green)"></div><div class="stat-label">Hired this quarter</div><div class="stat-value" style="color:var(--accent-green)">1</div><div class="stat-sub">Sofia R. — Designer</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-coral)"></div><div class="stat-label">Avg time to hire</div><div class="stat-value" style="color:var(--accent-coral)">24d</div><div class="stat-sub">Target: 21 days</div></div>
+    </div>
+
+    <div class="controls">
+      <div style="font-size:12px;color:var(--muted)">Role:</div>
+      <div class="role-filter">
+        <button class="rf-btn active" onclick="filterRole('all',this)">All roles</button>
+        <button class="rf-btn" onclick="filterRole('designer',this)">Designer</button>
+        <button class="rf-btn" onclick="filterRole('strategist',this)">Strategist</button>
+        <button class="rf-btn" onclick="filterRole('video',this)">Video</button>
+        <button class="rf-btn" onclick="filterRole('ops',this)">Ops</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:11px;color:var(--muted);margin-left:auto">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent-green)"></span>Sheets synced
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent-amber);margin-left:8px"></span>Priority
+      </div>
+    </div>
+
+    <div class="kanban">
+      <!-- APPLIED -->
+      <div class="k-col">
+        <div class="k-head"><div class="k-title" style="color:var(--muted)">Applied</div><div class="k-count">7</div></div>
+        <div class="ccard" data-role="designer" onclick="openD('Zara M.','Senior Designer')">
+          <div class="sheet-pip" title="Synced from Sheets"></div>
+          <div class="cc-name">Zara M.</div>
+          <div class="cc-role">Senior Designer</div>
+          <div class="cc-tags"><span class="cc-tag highlighted">Figma</span><span class="cc-tag">Branding</span><span class="cc-tag">Motion</span></div>
+          <div class="cc-bottom"><span class="cc-src">📄 Portfolio</span><span class="cc-date">Mar 28</span></div>
+        </div>
+        <div class="ccard" data-role="strategist" onclick="openD('Leo K.','Content Strategist')">
+          <div class="sheet-pip"></div>
+          <div class="cc-name">Leo K.</div>
+          <div class="cc-role">Content Strategist</div>
+          <div class="cc-tags"><span class="cc-tag">SEO</span><span class="cc-tag highlighted">Social</span><span class="cc-tag">Email</span></div>
+          <div class="cc-bottom"><span class="cc-src">📄 LinkedIn</span><span class="cc-date">Mar 27</span></div>
+        </div>
+        <div class="ccard" data-role="video" onclick="openD('Nia W.','Motion Designer')">
+          <div class="cc-name">Nia W.</div>
+          <div class="cc-role">Motion Designer</div>
+          <div class="cc-tags"><span class="cc-tag highlighted">After Effects</span><span class="cc-tag">C4D</span></div>
+          <div class="cc-bottom"><span class="cc-src">🌐 Website</span><span class="cc-date">Mar 26</span></div>
+        </div>
+        <div class="ccard" data-role="ops" onclick="openD('Sam T.','Account Manager')">
+          <div class="sheet-pip"></div>
+          <div class="cc-name">Sam T.</div>
+          <div class="cc-role">Account Manager</div>
+          <div class="cc-tags"><span class="cc-tag">Client comms</span><span class="cc-tag">Asana</span></div>
+          <div class="cc-bottom"><span class="cc-src">📄 Referral</span><span class="cc-date">Mar 25</span></div>
+        </div>
+      </div>
+
+      <!-- SCREENING -->
+      <div class="k-col">
+        <div class="k-head"><div class="k-title" style="color:var(--accent-blue)">Screening</div><div class="k-count">4</div></div>
+        <div class="ccard priority" data-role="designer" onclick="openD('Aiden C.','UI/UX Designer')">
+          <div class="sheet-pip"></div>
+          <span class="priority-star">★</span>
+          <div class="cc-name">Aiden C.</div>
+          <div class="cc-role">UI/UX Designer</div>
+          <div class="cc-tags"><span class="cc-tag highlighted">Figma</span><span class="cc-tag highlighted">Webflow</span><span class="cc-tag">CSS</span></div>
+          <div class="cc-bottom"><span class="cc-src">🌐 Dribbble</span><span class="cc-date">Screener sent</span></div>
+        </div>
+        <div class="ccard" data-role="strategist" onclick="openD('Mia F.','Growth Strategist')">
+          <div class="sheet-pip"></div>
+          <div class="cc-name">Mia F.</div>
+          <div class="cc-role">Growth Strategist</div>
+          <div class="cc-tags"><span class="cc-tag">Analytics</span><span class="cc-tag highlighted">Paid social</span></div>
+          <div class="cc-bottom"><span class="cc-src">📄 Inbound</span><span class="cc-date">Screener sent</span></div>
+        </div>
+      </div>
+
+      <!-- FIRST INTERVIEW -->
+      <div class="k-col">
+        <div class="k-head"><div class="k-title" style="color:var(--accent-amber)">1st Interview</div><div class="k-count">3</div></div>
+        <div class="ccard priority" data-role="designer" onclick="openD('Preet B.','Senior Designer')">
+          <span class="priority-star">★</span>
+          <div class="cc-name">Preet B.</div>
+          <div class="cc-role">Senior Designer</div>
+          <div class="cc-tags"><span class="cc-tag highlighted">Brand</span><span class="cc-tag highlighted">Identity</span><span class="cc-tag">Print</span></div>
+          <div class="cc-bottom"><span class="cc-src">📄 Portfolio</span><span class="cc-date">Apr 2 · 10am</span></div>
+        </div>
+        <div class="ccard" data-role="video" onclick="openD('Jake R.','Video Editor')">
+          <div class="cc-name">Jake R.</div>
+          <div class="cc-role">Video Editor</div>
+          <div class="cc-tags"><span class="cc-tag highlighted">Premiere</span><span class="cc-tag">DaVinci</span></div>
+          <div class="cc-bottom"><span class="cc-src">🎬 Showreel</span><span class="cc-date">Apr 3 · 2pm</span></div>
+        </div>
+      </div>
+
+      <!-- 2ND INTERVIEW -->
+      <div class="k-col">
+        <div class="k-head"><div class="k-title" style="color:var(--accent-purple)">2nd Interview</div><div class="k-count">2</div></div>
+        <div class="ccard priority" data-role="strategist" onclick="openD('Clara V.','Strategy Lead')">
+          <span class="priority-star">★</span>
+          <div class="cc-name">Clara V.</div>
+          <div class="cc-role">Strategy Lead</div>
+          <div class="cc-tags"><span class="cc-tag highlighted">Growth</span><span class="cc-tag highlighted">Decks</span><span class="cc-tag">Analytics</span></div>
+          <div class="cc-bottom"><span class="cc-src">📄 Referral</span><span class="cc-date">Apr 4 · 11am</span></div>
+        </div>
+        <div class="ccard" data-role="designer" onclick="openD('Omar H.','Brand Designer')">
+          <div class="cc-name">Omar H.</div>
+          <div class="cc-role">Brand Designer</div>
+          <div class="cc-tags"><span class="cc-tag highlighted">Figma</span><span class="cc-tag">Illustration</span></div>
+          <div class="cc-bottom"><span class="cc-src">🌐 Behance</span><span class="cc-date">Apr 5 · 3pm</span></div>
+        </div>
+      </div>
+
+      <!-- OFFER -->
+      <div class="k-col">
+        <div class="k-head"><div class="k-title" style="color:var(--accent-green)">Offer sent</div><div class="k-count">2</div></div>
+        <div class="ccard" data-role="designer" onclick="openD('Lena S.','Senior Designer')">
+          <div class="cc-name">Lena S.</div>
+          <div class="cc-role">Senior Designer</div>
+          <div class="cc-tags"><span class="cc-tag">Brand</span><span class="cc-tag">Motion</span></div>
+          <div class="cc-bottom"><span class="cc-src" style="color:var(--accent-amber)">⏳ Awaiting response</span><span class="cc-date">Sent Mar 29</span></div>
+        </div>
+        <div class="ccard" data-role="ops" onclick="openD('Ben A.','Account Manager')">
+          <div class="cc-name">Ben A.</div>
+          <div class="cc-role">Account Manager</div>
+          <div class="cc-tags"><span class="cc-tag">Client comms</span></div>
+          <div class="cc-bottom"><span class="cc-src" style="color:var(--accent-amber)">⏳ Awaiting response</span><span class="cc-date">Sent Mar 28</span></div>
+        </div>
+      </div>
+
+      <!-- HIRED -->
+      <div class="k-col">
+        <div class="k-head"><div class="k-title" style="color:var(--accent-green)">Hired ✓</div><div class="k-count">1</div></div>
+        <div class="ccard" data-role="designer" style="border-left:3px solid var(--accent-green);padding-left:10px;opacity:0.85">
+          <div class="cc-name">Sofia Reyes</div>
+          <div class="cc-role">UI/UX Designer</div>
+          <div class="cc-tags"><span class="cc-tag">Figma</span><span class="cc-tag">Webflow</span></div>
+          <div class="cc-bottom"><span class="cc-src" style="color:var(--accent-green)">✓ Joined Mar 3</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- CANDIDATE DRAWER -->
+<div class="drawer-overlay" id="dov" onclick="closeD()"></div>
+<div class="drawer" id="drw">
+  <button class="drawer-close" onclick="closeD()">✕</button>
+  <div class="drawer-title" id="d-name">Preet B.</div>
+  <div class="drawer-sub" id="d-role">Senior Designer · 1st Interview</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <span class="badge b-amber">Priority candidate</span>
+    <span class="badge b-purple">1st Interview</span>
+    <span style="font-size:10px;background:#E8F7F2;color:#1A7A57;border:1px solid #A8DEC8;border-radius:4px;padding:3px 8px;font-weight:500">📊 Sheets synced</span>
+  </div>
+  <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px">Move stage</div>
+  <div class="stage-grid">
+    <button class="sg">Applied</button><button class="sg">Screening</button><button class="sg active">1st Interview</button>
+    <button class="sg">2nd Interview</button><button class="sg" style="background:#E8F7F2;color:#1A7A57;border-color:#A8DEC8">Offer</button><button class="sg" style="color:var(--accent-coral)">Reject</button>
+  </div>
+  <div class="drow"><span class="dl">Role</span><span class="dv">Senior Designer</span></div>
+  <div class="drow"><span class="dl">Source</span><span class="dv">Portfolio referral</span></div>
+  <div class="drow"><span class="dl">Applied</span><span class="dv">Mar 22, 2026</span></div>
+  <div class="drow"><span class="dl">Interview</span><span class="dv" style="color:var(--accent-amber)">Apr 2 · 10am — Zoom</span></div>
+  <div class="drow"><span class="dl">Interviewer</span><span class="dv">Jamie L. + Haley L.</span></div>
+  <div class="drow"><span class="dl">Portfolio</span><span class="dv" style="color:var(--accent-blue);cursor:pointer" onclick="showToast('Portfolio opened','🔗')">preetb.design ↗</span></div>
+  <div class="drow"><span class="dl">Salary range</span><span class="dv">$75k – $90k</span></div>
+  <div style="margin-top:16px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:6px">Notes</div>
+    <textarea class="notes-ta">Strong brand portfolio, especially identity work. Asked great questions about IDC's process. Wants hybrid. Check refs before 2nd round.</textarea>
+  </div>
+  <div style="margin-top:16px">
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px">Activity</div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent-amber)"></div><div><div class="tl-text">1st interview scheduled · Apr 2 10am</div><div class="tl-date">Mar 30, 2026</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent-blue)"></div><div><div class="tl-text">Screener call completed · Positive · 30min</div><div class="tl-date">Mar 27, 2026</div></div></div>
+    <div class="tl-item"><div class="tl-dot" style="background:var(--accent-green)"></div><div><div class="tl-text">Application received via portfolio referral</div><div class="tl-date">Mar 22, 2026</div></div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:22px">
+    <button class="btn btn-primary" style="flex:1" onclick="showToast('Changes saved','✓');closeD()">Save changes</button>
+    <button class="btn btn-ghost" onclick="showToast('Interview link copied','📋')">Copy invite</button>
+  </div>
+</div>
+
+<!-- ADD CANDIDATE MODAL -->
+<div class="modal-overlay" id="add-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-title">Add candidate</div><div class="modal-sub">Syncs to Google Sheets automatically</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-row"><label class="form-label">First name</label><input class="form-input" placeholder="First"/></div>
+      <div class="form-row"><label class="form-label">Last name</label><input class="form-input" placeholder="Last"/></div>
+    </div>
+    <div class="form-row"><label class="form-label">Role applying for</label><select class="form-select"><option>Senior Designer</option><option>UI/UX Designer</option><option>Content Strategist</option><option>Strategy Lead</option><option>Video Editor</option><option>Account Manager</option></select></div>
+    <div class="form-row"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="candidate@email.com"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-row"><label class="form-label">Source</label><select class="form-select"><option>Referral</option><option>Portfolio</option><option>LinkedIn</option><option>Inbound</option><option>Agency</option></select></div>
+      <div class="form-row"><label class="form-label">Stage</label><select class="form-select"><option>Applied</option><option>Screening</option><option>1st Interview</option><option>2nd Interview</option></select></div>
+    </div>
+    <div class="form-row"><label class="form-label">Portfolio / CV link</label><input class="form-input" placeholder="https://…"/></div>
+    <div class="form-row"><label class="form-label">Notes</label><textarea class="form-input" style="height:70px;resize:vertical" placeholder="Initial notes…"></textarea></div>
+    <div class="sheet-info">📊 This candidate will be auto-added to the Hiring Google Sheet and tagged with the current stage.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="this.closest('.modal-overlay').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" onclick="this.closest('.modal-overlay').classList.remove('open');showToast('Candidate added + synced to Sheets','📊')">Add + sync to Sheets</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>
+function setRole(r,btn){
+  document.querySelectorAll('.rt-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  document.getElementById('rlabel').textContent=r==='admin'?'Admin':'Employee';
+  document.getElementById('rgate').style.display=r==='employee'?'block':'none';
+  const ac=document.getElementById('ac');const aa=document.getElementById('aa');
+  if(r==='employee'){ac.classList.remove('visible');aa.style.display='none';}
+  else{ac.classList.add('visible');aa.style.display='flex';}
+  document.getElementById('uav').style.background=r==='admin'?'linear-gradient(135deg,#F0A500,#E85D4A)':'linear-gradient(135deg,#3B6FE8,#7C5CBF)';
+}
+function filterRole(r,el){
+  document.querySelectorAll('.rf-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  document.querySelectorAll('.ccard').forEach(c=>{c.style.display=(r==='all'||c.dataset.role===r)?'':'none';});
+}
+function openD(name,role){
+  document.getElementById('d-name').textContent=name;
+  document.getElementById('d-role').textContent=role+' · Pipeline';
+  document.getElementById('drw').classList.add('open');document.getElementById('dov').classList.add('open');
+}
+function closeD(){document.getElementById('drw').classList.remove('open');document.getElementById('dov').classList.remove('open');}
+function showToast(m,i='✓'){const t=document.getElementById('toast');t.innerHTML=`<span style="font-size:16px">${i}</span>${m}`;t.style.transform='translateY(0)';t.style.opacity='1';setTimeout(()=>{t.style.transform='translateY(80px)';t.style.opacity='0';},3000);}
+</script>
+</body>
+</html>

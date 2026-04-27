@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --gold:#F0A500;--silver:#9AA0AC;--bronze:#C87840;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.nav-item.admin-only.active{border-left-color:var(--accent-amber)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto;letter-spacing:0.06em}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0A500,#E85D4A);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(59,111,232,0.2);color:#7EB8FF;border-color:rgba(59,111,232,0.3)}
+.main{margin-left:220px;flex:1;padding:32px;max-width:1100px}
+.page-header{margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--gold)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+
+/* PERIOD TABS */
+.period-tabs{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px;margin-bottom:24px;width:fit-content}
+.pt{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all 0.15s;font-family:inherit}
+.pt.active{background:var(--accent-blue);color:#fff}
+
+/* TOP 3 PODIUM */
+.podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px;align-items:end}
+.podium-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:24px 20px;text-align:center;position:relative;overflow:hidden;transition:transform 0.2s}
+.podium-card:hover{transform:translateY(-3px)}
+.podium-card.p1{border-color:rgba(240,165,0,0.4);background:linear-gradient(160deg,#FFFBF0 0%,#FFF 60%)}
+.podium-card.p2{order:-1}
+.podium-card.p3{order:1}
+.podium-rank{position:absolute;top:14px;left:16px;font-size:20px}
+.podium-medal{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;margin:0 auto 12px;position:relative}
+.podium-medal.gold{background:linear-gradient(135deg,#F0A500,#F8D060)}
+.podium-medal.silver{background:linear-gradient(135deg,#8A9099,#BFC5CC)}
+.podium-medal.bronze{background:linear-gradient(135deg,#A05820,#D09060)}
+.podium-name{font-size:15px;font-weight:600;margin-bottom:2px}
+.podium-role{font-size:11px;color:var(--muted);margin-bottom:12px}
+.podium-pts{font-family:'Fraunces',serif;font-size:28px;font-weight:600;letter-spacing:-1px;line-height:1}
+.podium-pts-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-top:3px}
+.podium-badges{display:flex;gap:4px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.pbadge{font-size:16px}
+.pts-delta{font-size:11px;margin-top:6px;font-weight:500}
+.delta-up{color:var(--accent-green)}
+.delta-dn{color:var(--accent-coral)}
+
+/* FULL TABLE */
+.lb-table{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:24px}
+.lb-row{display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid var(--border);transition:background 0.1s;cursor:pointer}
+.lb-row:last-child{border-bottom:none}
+.lb-row:hover{background:#FAFAF8}
+.lb-row.me{background:linear-gradient(90deg,rgba(59,111,232,0.04) 0%,transparent 100%);border-left:3px solid var(--accent-blue);padding-left:17px}
+.rank-num{width:28px;font-size:14px;font-weight:600;color:var(--muted);text-align:center;flex-shrink:0}
+.rank-num.top{color:var(--gold)}
+.lb-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.lb-name{flex:1;font-weight:500;font-size:14px}
+.lb-role{font-size:11px;color:var(--muted);margin-top:1px}
+.lb-badges{display:flex;gap:3px;flex-shrink:0}
+.lb-pts{font-family:'Fraunces',serif;font-size:20px;font-weight:600;letter-spacing:-0.5px;flex-shrink:0;width:60px;text-align:right}
+.lb-delta{font-size:11px;font-weight:500;flex-shrink:0;width:48px;text-align:right}
+.lb-bar-wrap{width:100px;flex-shrink:0}
+.lb-bar-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.lb-bar-fill{height:100%;border-radius:3px;background:var(--accent-blue)}
+.me-chip{font-size:10px;font-weight:600;background:rgba(59,111,232,0.1);color:var(--accent-blue);border-radius:4px;padding:2px 6px;flex-shrink:0}
+
+/* CHALLENGE SECTION */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.challenge-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px}
+.cc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cc-title{font-size:13px;font-weight:600}
+.cc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.challenge-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.challenge-row:last-child{border-bottom:none}
+.ch-num{font-family:'Fraunces',serif;font-size:18px;font-weight:600;width:30px;text-align:center;flex-shrink:0}
+.ch-name{flex:1;font-size:13px;font-weight:500}
+.ch-pts{font-size:11px;font-weight:600;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;color:var(--muted)}
+.ch-pts.done{background:#E8F7F2;border-color:#A8DEC8;color:#1A7A57}
+
+/* ACHIEVEMENTS */
+.ach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.ach-card{background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border);padding:14px;text-align:center;transition:all 0.15s}
+.ach-card:hover{border-color:#C8C0B0;transform:translateY(-1px)}
+.ach-card.locked{opacity:0.45;filter:grayscale(0.5)}
+.ach-icon{font-size:28px;margin-bottom:8px}
+.ach-name{font-size:12px;font-weight:600;margin-bottom:3px}
+.ach-desc{font-size:10px;color:var(--muted);line-height:1.4}
+.ach-pts{font-size:10px;font-weight:600;color:var(--accent-amber);margin-top:5px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s}
+.btn-primary{background:var(--accent-blue);color:#fff}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.sec-div{display:flex;align-items:center;gap:16px;margin:28px 0 16px}
+.sec-div h2{font-family:'Fraunces',serif;font-size:20px;font-weight:300;font-style:italic;white-space:nowrap}
+.div-line{flex:1;height:1px;background:var(--border)}
+#toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:600;display:flex;align-items:center;gap:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.podium-card,.lb-row,.ach-card{animation:fadeUp 0.3s ease both}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="03-team.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/><path d="M11 7c2 0 4 1 4 4"/><circle cx="12" cy="3.5" r="2"/></svg>Team</a>
+      <a class="nav-item active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+      <a class="nav-item" href="05-handbook.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h4M5 8h4M5 11h2"/><rect x="10" y="1" width="4" height="14" rx="1"/></svg>Handbook</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>Client Budgets</a>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+      <a class="nav-item" href="06-partners.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l4-4 4 4 4-4"/></svg>Partners</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only" href="admin/01-invoices.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/02-sales-pipeline.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/03-analytics.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="07-hiring.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="role-toggle"><button class="rt-btn active">Employee</button><button class="rt-btn">Admin</button></div>
+  <div class="sidebar-user"><div class="user-avatar">JL</div><div><div class="user-name">Jamie L.</div><div class="user-role">Designer</div></div></div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div><h1>Team <em>Leaderboard</em></h1><p>Weekly points · Friday Games · Challenges · Streak tracking</p></div>
+    <button class="btn btn-primary" onclick="showToast('Submit challenge entry','🎯')">Submit entry</button>
+  </div>
+
+  <div class="period-tabs">
+    <button class="pt active" onclick="setPeriod(this)">This week</button>
+    <button class="pt" onclick="setPeriod(this)">This month</button>
+    <button class="pt" onclick="setPeriod(this)">All time</button>
+  </div>
+
+  <!-- PODIUM TOP 3 -->
+  <div class="podium">
+    <!-- #2 -->
+    <div class="podium-card p2">
+      <div class="podium-rank">🥈</div>
+      <div class="podium-medal silver">HL</div>
+      <div class="podium-name">Haley Lin</div>
+      <div class="podium-role">Strategy Lead</div>
+      <div class="podium-pts" style="color:var(--silver)">420</div>
+      <div class="podium-pts-lbl">points</div>
+      <div class="podium-badges"><span class="pbadge">🎯</span><span class="pbadge">🔥</span><span class="pbadge">⚡</span></div>
+      <div class="pts-delta delta-up">↑ 38 this week</div>
+    </div>
+    <!-- #1 -->
+    <div class="podium-card p1">
+      <div class="podium-rank">🥇</div>
+      <div class="podium-medal gold">RG</div>
+      <div class="podium-name">Roger Grant</div>
+      <div class="podium-role">Video Director</div>
+      <div class="podium-pts" style="color:var(--gold)">580</div>
+      <div class="podium-pts-lbl">points</div>
+      <div class="podium-badges"><span class="pbadge">🏆</span><span class="pbadge">🎬</span><span class="pbadge">🔥</span><span class="pbadge">⚡</span></div>
+      <div class="pts-delta delta-up">↑ 62 this week</div>
+    </div>
+    <!-- #3 -->
+    <div class="podium-card p3">
+      <div class="podium-rank">🥉</div>
+      <div class="podium-medal bronze">JL</div>
+      <div class="podium-name">Jamie Lee</div>
+      <div class="podium-role">Senior Designer</div>
+      <div class="podium-pts" style="color:var(--bronze)">310</div>
+      <div class="podium-pts-lbl">points</div>
+      <div class="podium-badges"><span class="pbadge">🎨</span><span class="pbadge">🔥</span></div>
+      <div class="pts-delta delta-up">↑ 20 this week</div>
+    </div>
+  </div>
+
+  <!-- FULL RANKINGS -->
+  <div class="lb-table">
+    <div class="lb-row" style="background:var(--bg);border-bottom:1px solid var(--border)">
+      <div style="width:28px;font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)">#</div>
+      <div style="width:36px"></div>
+      <div style="flex:1;font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)">Member</div>
+      <div style="width:60px;font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);text-align:right">Pts</div>
+      <div style="width:48px;font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);text-align:right">Δ</div>
+      <div style="width:100px;font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)"></div>
+      <div style="width:60px;font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);text-align:right">Badges</div>
+    </div>
+    <div class="lb-row"><div class="rank-num top">1</div><div class="lb-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div><div style="flex:1"><div class="lb-name">Roger Grant</div><div class="lb-role">Video Director</div></div><div class="lb-pts" style="color:var(--gold)">580</div><div class="lb-delta delta-up">+62</div><div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:100%;background:var(--gold)"></div></div></div><div class="lb-badges">🏆🎬🔥⚡</div></div>
+    <div class="lb-row"><div class="rank-num top">2</div><div class="lb-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">HL</div><div style="flex:1"><div class="lb-name">Haley Lin</div><div class="lb-role">Strategy Lead</div></div><div class="lb-pts" style="color:var(--silver)">420</div><div class="lb-delta delta-up">+38</div><div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:72%;background:var(--silver)"></div></div></div><div class="lb-badges">🎯🔥⚡</div></div>
+    <div class="lb-row me"><div class="rank-num" style="color:var(--accent-blue)">3</div><div class="lb-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">JL</div><div style="flex:1"><div class="lb-name">Jamie Lee</div><div class="lb-role">Senior Designer</div></div><div class="lb-pts" style="color:var(--bronze)">310</div><div class="lb-delta delta-up">+20</div><div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:53%;background:var(--bronze)"></div></div></div><div class="lb-badges">🎨🔥</div><div class="me-chip">You</div></div>
+    <div class="lb-row"><div class="rank-num">4</div><div class="lb-av" style="background:linear-gradient(135deg,#7C5CBF,#E85D4A)">SR</div><div style="flex:1"><div class="lb-name">Sofia Reyes</div><div class="lb-role">UI/UX Designer</div></div><div class="lb-pts">280</div><div class="lb-delta delta-up">+18</div><div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:48%"></div></div></div><div class="lb-badges">🎨⚡</div></div>
+    <div class="lb-row"><div class="rank-num">5</div><div class="lb-av" style="background:linear-gradient(135deg,#2DAE7F,#F0A500)">JM</div><div style="flex:1"><div class="lb-name">Jordan Mills</div><div class="lb-role">Ops Manager</div></div><div class="lb-pts">240</div><div class="lb-delta delta-up">+14</div><div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:41%"></div></div></div><div class="lb-badges">⚙️🔥</div></div>
+    <div class="lb-row"><div class="rank-num">6</div><div class="lb-av" style="background:linear-gradient(135deg,#3B6FE8,#2DAE7F)">MW</div><div style="flex:1"><div class="lb-name">Marcus Webb</div><div class="lb-role">Motion Designer</div></div><div class="lb-pts">210</div><div class="lb-delta delta-up">+10</div><div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:36%"></div></div></div><div class="lb-badges">🎬</div></div>
+    <div class="lb-row"><div class="rank-num">7</div><div class="lb-av" style="background:linear-gradient(135deg,#F0A500,#7C5CBF)">DC</div><div style="flex:1"><div class="lb-name">Dana Cruz</div><div class="lb-role">Account Manager</div></div><div class="lb-pts">185</div><div class="lb-delta delta-dn">–5</div><div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:32%"></div></div></div><div class="lb-badges">⭐</div></div>
+    <div class="lb-row"><div class="rank-num">8</div><div class="lb-av" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">PN</div><div style="flex:1"><div class="lb-name">Priya Nair</div><div class="lb-role">Content Strategist</div></div><div class="lb-pts">140</div><div class="lb-delta" style="color:var(--muted)">—</div><div class="lb-bar-wrap"><div class="lb-bar-bg"><div class="lb-bar-fill" style="width:24%"></div></div></div><div class="lb-badges">✍️</div></div>
+  </div>
+
+  <!-- CHALLENGES + GAMES SIDE BY SIDE -->
+  <div class="two-col">
+    <div class="challenge-card">
+      <div class="cc-head">
+        <div><div class="cc-title">This week's challenges</div><div class="cc-sub">Ends Friday 6pm</div></div>
+        <span style="font-size:20px">🎯</span>
+      </div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--accent-green)">✓</div><div class="ch-name">Post a client win to #wins Slack</div><div class="ch-pts done">+15 pts</div></div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--accent-green)">✓</div><div class="ch-name">Complete Friday Game submission</div><div class="ch-pts done">+20 pts</div></div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--muted)">○</div><div class="ch-name">Leave feedback on a teammate's work</div><div class="ch-pts">+10 pts</div></div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--muted)">○</div><div class="ch-name">No-meeting morning this week</div><div class="ch-pts">+15 pts</div></div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--muted)">○</div><div class="ch-name">Share a resource in #learning</div><div class="ch-pts">+10 pts</div></div>
+    </div>
+    <div class="challenge-card">
+      <div class="cc-head">
+        <div><div class="cc-title">Friday Games — Week 13</div><div class="cc-sub">Design Roast · Voting closes Fri 5pm</div></div>
+        <span style="font-size:20px">🎮</span>
+      </div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--gold)">1</div><div class="ch-name">Roger's "brutalist email client"</div><div class="ch-pts done">24 votes</div></div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--silver)">2</div><div class="ch-name">Sofia's "pastel chaos dashboard"</div><div class="ch-pts done">19 votes</div></div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--bronze)">3</div><div class="ch-name">Jamie's "skeuomorphic app store"</div><div class="ch-pts">14 votes</div></div>
+      <div class="challenge-row"><div class="ch-num" style="color:var(--muted)">4</div><div class="ch-name">Marcus's "corporate clipart revival"</div><div class="ch-pts">8 votes</div></div>
+      <button class="btn btn-ghost" style="margin-top:12px;width:100%;justify-content:center" onclick="showToast('Voting opens Friday 9am','🗳️')">Cast your vote Friday →</button>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="sec-div"><h2>Achievements & badges</h2><div class="div-line"></div></div>
+  <div class="ach-grid">
+    <div class="ach-card"><div class="ach-icon">🏆</div><div class="ach-name">Top of the week</div><div class="ach-desc">Rank #1 for a full week</div><div class="ach-pts">+100 pts</div></div>
+    <div class="ach-card"><div class="ach-icon">🔥</div><div class="ach-name">On fire</div><div class="ach-desc">3-week winning streak</div><div class="ach-pts">+50 pts</div></div>
+    <div class="ach-card"><div class="ach-icon">🎬</div><div class="ach-name">Director's cut</div><div class="ach-desc">Win 5 Friday Games</div><div class="ach-pts">+75 pts</div></div>
+    <div class="ach-card"><div class="ach-icon">🎨</div><div class="ach-name">Design head</div><div class="ach-desc">Submit 10 challenges</div><div class="ach-pts">+60 pts</div></div>
+    <div class="ach-card locked"><div class="ach-icon">⚡</div><div class="ach-name">Speed demon</div><div class="ach-desc">Complete all weekly challenges</div><div class="ach-pts">+40 pts</div></div>
+    <div class="ach-card locked"><div class="ach-icon">🧠</div><div class="ach-name">Big brain</div><div class="ach-desc">Share 10 resources in #learning</div><div class="ach-pts">+45 pts</div></div>
+    <div class="ach-card locked"><div class="ach-icon">🌟</div><div class="ach-name">All-star</div><div class="ach-desc">Top 3 for an entire month</div><div class="ach-pts">+150 pts</div></div>
+    <div class="ach-card locked"><div class="ach-icon">🤝</div><div class="ach-name">Team player</div><div class="ach-desc">Give feedback 20 times</div><div class="ach-pts">+50 pts</div></div>
+  </div>
+</main>
+
+<div id="toast"></div>
+<script>
+function setPeriod(el){document.querySelectorAll('.pt').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function showToast(m,i='✓'){const t=document.getElementById('toast');t.innerHTML=`<span style="font-size:16px">${i}</span>${m}`;t.style.transform='translateY(0)';t.style.opacity='1';setTimeout(()=>{t.style.transform='translateY(80px)';t.style.opacity='0';},3000);}
+</script>
+</body>
+</html>

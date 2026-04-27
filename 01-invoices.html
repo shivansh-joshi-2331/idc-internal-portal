@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Invoices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;font-weight:400;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.nav-item.admin-only.active{border-left-color:var(--accent-amber)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0A500,#E85D4A);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(240,165,0,0.2);color:var(--accent-amber);border-color:rgba(240,165,0,0.3)}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;padding:32px;max-width:1200px}
+.page-header{margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--accent-amber)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+
+/* ROLE GATE */
+.role-gate{background:var(--surface);border-radius:var(--radius);border:2px dashed var(--border);padding:60px 40px;text-align:center;margin-top:20px}
+.gate-icon{font-size:48px;margin-bottom:16px}
+.gate-title{font-family:'Fraunces',serif;font-size:26px;font-weight:300;margin-bottom:8px}
+.gate-body{font-size:14px;color:var(--muted);max-width:400px;margin:0 auto 24px;line-height:1.6}
+.gate-badge{display:inline-flex;align-items:center;gap:6px;background:#FEF3DC;color:#A06500;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600}
+
+/* ADMIN CONTENT */
+.admin-content{display:none}
+.admin-content.visible{display:block;animation:fadeUp 0.3s ease}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid var(--border);position:relative;overflow:hidden}
+.stat-card .accent-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px}
+.stat-value{font-family:'Fraunces',serif;font-size:28px;font-weight:600;letter-spacing:-1px;line-height:1}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.filter-select{padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;color:var(--text);cursor:pointer}
+.search-input{flex:1;max-width:280px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;outline:none}
+.search-input:focus{border-color:var(--accent-blue)}
+.filter-tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s}
+.filter-tab.active{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue)}
+.filter-tab.overdue-tab.active{background:var(--accent-coral);border-color:var(--accent-coral)}
+
+/* TABLE */
+.table-wrap{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg)}
+th{padding:12px 16px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
+th.sortable{cursor:pointer}
+th.sortable:hover{color:var(--text)}
+td{padding:13px 16px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF8}
+tr.overdue-row td{background:rgba(232,93,74,0.02)}
+tr.overdue-row:hover td{background:rgba(232,93,74,0.04)}
+.client-name{font-weight:600}
+.client-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.invoice-num{font-family:'DM Sans',monospace;font-size:12px;color:var(--accent-blue);cursor:pointer}
+.invoice-num:hover{text-decoration:underline}
+.amount{font-weight:600;font-size:14px}
+.amount.overdue{color:var(--accent-coral)}
+.due-date{font-size:12px}
+.overdue-label{color:var(--accent-coral);font-weight:500}
+.days-over{font-size:11px;color:var(--accent-coral);background:rgba(232,93,74,0.1);padding:2px 6px;border-radius:4px;margin-top:2px;display:inline-block}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:500;white-space:nowrap}
+.badge-green{background:#E8F7F2;color:#1A7A57}
+.badge-amber{background:#FEF3DC;color:#A06500}
+.badge-coral{background:#FDEDEB;color:#B03020}
+.badge-blue{background:#EBF0FD;color:#2850C0}
+.badge-gray{background:#F0EEE8;color:var(--muted)}
+.badge-purple{background:#F0EDFA;color:#5C3E9A}
+
+/* ACTION BTNS */
+.action-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:var(--radius-sm);font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s;margin-right:4px}
+.action-btn:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.action-btn.danger:hover{border-color:var(--accent-coral);color:var(--accent-coral)}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
+.btn-primary{background:var(--accent-blue);color:#fff}
+.btn-primary:hover{background:#2A5ED4}
+.btn-amber{background:var(--accent-amber);color:#fff}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+
+/* ASANA TASK INDICATOR */
+.asana-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#E8622A;background:rgba(232,98,42,0.08);border-radius:4px;padding:2px 6px;border:1px solid rgba(232,98,42,0.2)}
+
+/* OVERDUE BANNER */
+.overdue-banner{background:rgba(232,93,74,0.06);border:1px solid rgba(232,93,74,0.2);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+.ob-icon{font-size:22px;flex-shrink:0}
+.ob-text{flex:1}
+.ob-title{font-weight:600;font-size:14px;color:var(--accent-coral);margin-bottom:2px}
+.ob-body{font-size:12px;color:var(--muted)}
+
+/* STRIPE SYNC BAR */
+.sync-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 0 2px rgba(45,174,127,0.2);animation:syncPulse 2s ease-in-out infinite}
+@keyframes syncPulse{0%,100%{box-shadow:0 0 0 2px rgba(45,174,127,0.2)}50%{box-shadow:0 0 0 5px rgba(45,174,127,0.1)}}
+.sync-text{flex:1;font-size:12px;color:var(--muted)}
+.sync-text strong{color:var(--text)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.5);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);padding:28px;width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
+.modal-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.form-row{margin-bottom:14px}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px}
+.form-input,.form-select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none;transition:border-color 0.15s}
+.form-input:focus,.form-select:focus{border-color:var(--accent-blue)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.btn-cancel{padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer}
+
+/* INVOICE DETAIL DRAWER */
+.drawer{position:fixed;top:0;right:-440px;width:440px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:200;padding:28px;overflow-y:auto;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.08)}
+.drawer.open{right:0}
+.drawer-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);margin-bottom:20px;transition:all 0.15s}
+.drawer-close:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.drawer-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:4px}
+.drawer-sub{font-size:12px;color:var(--muted);margin-bottom:24px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--border)}
+.detail-row:last-child{border-bottom:none}
+.detail-label{font-size:12px;color:var(--muted)}
+.detail-value{font-size:13px;font-weight:500}
+.timeline{margin-top:20px}
+.timeline-title{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:12px}
+.timeline-item{display:flex;gap:12px;margin-bottom:12px}
+.tl-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.tl-text{font-size:12px;line-height:1.5}
+.tl-date{font-size:11px;color:var(--muted);margin-top:2px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="wordmark">IDC</div>
+    <div class="tag">Internal Portal</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="../01-dashboard.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="../02-schedule.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>
+        Schedule
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>
+        Leaderboard
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="../03-ops-capacity.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>
+        Client Budgets
+      </a>
+      <a class="nav-item" href="../03-ops-capacity.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+        Capacity
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only active" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>
+        Invoices
+        <span class="admin-badge">Admin</span>
+      </a>
+      <a class="nav-item admin-only" href="02-sales-pipeline.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>
+        Sales Pipeline
+        <span class="admin-badge">Admin</span>
+      </a>
+      <a class="nav-item admin-only" href="03-analytics.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>
+        Analytics Hub
+        <span class="admin-badge">Admin</span>
+      </a>
+      <a class="nav-item admin-only" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>
+        Hiring
+        <span class="admin-badge">Admin</span>
+      </a>
+    </div>
+  </nav>
+  <div class="role-toggle">
+    <button class="rt-btn" onclick="setRole('employee')">Employee</button>
+    <button class="rt-btn active" onclick="setRole('admin')">Admin</button>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar">JL</div>
+    <div><div class="user-name">Jamie L.</div><div class="user-role" id="role-label">Admin</div></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <h1>Invoice <em>Tracker</em></h1>
+      <p>Stripe-synced · Live invoice status · Overdue alerts</p>
+    </div>
+    <div style="display:flex;gap:10px" id="admin-actions">
+      <button class="btn btn-ghost" onclick="syncStripe()">⟳ Sync Stripe</button>
+      <button class="btn btn-primary" onclick="document.getElementById('add-modal').classList.add('open')">+ Add invoice</button>
+    </div>
+  </div>
+
+  <!-- ROLE GATE (shown to employees) -->
+  <div class="role-gate" id="role-gate">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">Admin access required</div>
+    <div class="gate-body">Invoice data includes client billing amounts and payment status. This section is restricted to admin users only. Contact your administrator if you need access.</div>
+    <div class="gate-badge">🛡️ Admin only · Finance</div>
+  </div>
+
+  <!-- ADMIN CONTENT -->
+  <div class="admin-content" id="admin-content">
+
+    <!-- STRIPE SYNC STATUS -->
+    <div class="sync-bar">
+      <div class="sync-dot"></div>
+      <div class="sync-text"><strong>Stripe connected</strong> · Last synced 4 minutes ago · 24 invoices tracked</div>
+      <button class="action-btn" onclick="syncStripe()">⟳ Sync now</button>
+    </div>
+
+    <!-- OVERDUE BANNER -->
+    <div class="overdue-banner">
+      <div class="ob-icon">⚠️</div>
+      <div class="ob-text">
+        <div class="ob-title">3 overdue invoices · $14,750 outstanding</div>
+        <div class="ob-body">Asana reminder tasks have been auto-created for Acme Corp and Bright Digital. Nova Ventures task pending.</div>
+      </div>
+      <button class="btn btn-amber" onclick="createAsanaTasks()">Create Asana tasks</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="accent-bar" style="background:var(--accent-blue)"></div>
+        <div class="stat-label">Total outstanding</div>
+        <div class="stat-value">$42,800</div>
+        <div class="stat-sub">8 open invoices</div>
+      </div>
+      <div class="stat-card">
+        <div class="accent-bar" style="background:var(--accent-coral)"></div>
+        <div class="stat-label">Overdue</div>
+        <div class="stat-value" style="color:var(--accent-coral)">$14,750</div>
+        <div class="stat-sub">3 invoices past due</div>
+      </div>
+      <div class="stat-card">
+        <div class="accent-bar" style="background:var(--accent-green)"></div>
+        <div class="stat-label">Collected MTD</div>
+        <div class="stat-value">$38,400</div>
+        <div class="stat-sub">↑ 12% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="accent-bar" style="background:var(--accent-amber)"></div>
+        <div class="stat-label">Avg days to pay</div>
+        <div class="stat-value">18</div>
+        <div class="stat-sub">Net-30 terms standard</div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-bar">
+      <input class="search-input" placeholder="Search client or invoice #..." oninput="filterTable(this.value)"/>
+      <div class="filter-tab active" onclick="filterStatus('all',this)">All</div>
+      <div class="filter-tab overdue-tab" onclick="filterStatus('overdue',this)">Overdue <span style="background:var(--accent-coral);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">3</span></div>
+      <div class="filter-tab" onclick="filterStatus('pending',this)">Pending</div>
+      <div class="filter-tab" onclick="filterStatus('paid',this)">Paid</div>
+      <select class="filter-select" style="margin-left:auto">
+        <option>All clients</option>
+        <option>Acme Corp</option>
+        <option>Bright Digital</option>
+        <option>Nova Ventures</option>
+        <option>Solis Health</option>
+      </select>
+      <select class="filter-select">
+        <option>Last 90 days</option>
+        <option>Last 30 days</option>
+        <option>This quarter</option>
+        <option>This year</option>
+      </select>
+    </div>
+
+    <!-- INVOICE TABLE -->
+    <div class="table-wrap">
+      <table id="invoice-table">
+        <thead>
+          <tr>
+            <th class="sortable">Invoice #</th>
+            <th class="sortable">Client</th>
+            <th class="sortable">Amount</th>
+            <th class="sortable">Issued</th>
+            <th class="sortable">Due date</th>
+            <th>Status</th>
+            <th>Asana</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- OVERDUE -->
+          <tr class="overdue-row" data-status="overdue" data-client="Acme Corp">
+            <td><div class="invoice-num" onclick="openDrawer('INV-2026-041')">INV-2026-041</div></td>
+            <td><div class="client-name">Acme Corp</div><div class="client-sub">Enterprise retainer</div></td>
+            <td><div class="amount overdue">$8,500</div></td>
+            <td><div class="due-date">Feb 28, 2026</div></td>
+            <td><div class="due-date overdue-label">Mar 1, 2026</div><div class="days-over">29 days over</div></td>
+            <td><span class="badge badge-coral">⚠ Overdue</span></td>
+            <td><span class="asana-tag">✓ Task created</span></td>
+            <td>
+              <button class="action-btn" onclick="markPaid('INV-2026-041')">Mark paid</button>
+              <button class="action-btn" onclick="sendReminder('INV-2026-041')">Remind</button>
+            </td>
+          </tr>
+          <tr class="overdue-row" data-status="overdue" data-client="Bright Digital">
+            <td><div class="invoice-num" onclick="openDrawer('INV-2026-038')">INV-2026-038</div></td>
+            <td><div class="client-name">Bright Digital</div><div class="client-sub">Growth monthly</div></td>
+            <td><div class="amount overdue">$3,200</div></td>
+            <td><div class="due-date">Feb 15, 2026</div></td>
+            <td><div class="due-date overdue-label">Mar 15, 2026</div><div class="days-over">15 days over</div></td>
+            <td><span class="badge badge-coral">⚠ Overdue</span></td>
+            <td><span class="asana-tag">✓ Task created</span></td>
+            <td>
+              <button class="action-btn" onclick="markPaid('INV-2026-038')">Mark paid</button>
+              <button class="action-btn">Remind</button>
+            </td>
+          </tr>
+          <tr class="overdue-row" data-status="overdue" data-client="Nova Ventures">
+            <td><div class="invoice-num" onclick="openDrawer('INV-2026-035')">INV-2026-035</div></td>
+            <td><div class="client-name">Nova Ventures</div><div class="client-sub">Enterprise retainer</div></td>
+            <td><div class="amount overdue">$3,050</div></td>
+            <td><div class="due-date">Feb 28, 2026</div></td>
+            <td><div class="due-date overdue-label">Mar 28, 2026</div><div class="days-over">2 days over</div></td>
+            <td><span class="badge badge-coral">⚠ Overdue</span></td>
+            <td><button class="action-btn" onclick="createSingleTask('Nova Ventures')">+ Create task</button></td>
+            <td>
+              <button class="action-btn" onclick="markPaid('INV-2026-035')">Mark paid</button>
+              <button class="action-btn">Remind</button>
+            </td>
+          </tr>
+          <!-- PENDING -->
+          <tr data-status="pending" data-client="Solis Health">
+            <td><div class="invoice-num" onclick="openDrawer('INV-2026-044')">INV-2026-044</div></td>
+            <td><div class="client-name">Solis Health</div><div class="client-sub">Project milestone</div></td>
+            <td><div class="amount">$5,750</div></td>
+            <td><div class="due-date">Mar 15, 2026</div></td>
+            <td><div class="due-date">Apr 14, 2026</div></td>
+            <td><span class="badge badge-amber">Pending</span></td>
+            <td>—</td>
+            <td><button class="action-btn" onclick="markPaid('INV-2026-044')">Mark paid</button></td>
+          </tr>
+          <tr data-status="pending" data-client="Meridian Co.">
+            <td><div class="invoice-num">INV-2026-043</div></td>
+            <td><div class="client-name">Meridian Co.</div><div class="client-sub">Monthly retainer</div></td>
+            <td><div class="amount">$2,800</div></td>
+            <td><div class="due-date">Mar 20, 2026</div></td>
+            <td><div class="due-date">Apr 19, 2026</div></td>
+            <td><span class="badge badge-amber">Pending</span></td>
+            <td>—</td>
+            <td><button class="action-btn">Mark paid</button></td>
+          </tr>
+          <tr data-status="pending" data-client="Acme Corp">
+            <td><div class="invoice-num">INV-2026-045</div></td>
+            <td><div class="client-name">Acme Corp</div><div class="client-sub">Enterprise retainer</div></td>
+            <td><div class="amount">$8,500</div></td>
+            <td><div class="due-date">Mar 28, 2026</div></td>
+            <td><div class="due-date">Apr 27, 2026</div></td>
+            <td><span class="badge badge-blue">Sent</span></td>
+            <td>—</td>
+            <td><button class="action-btn">Mark paid</button></td>
+          </tr>
+          <!-- PAID -->
+          <tr data-status="paid" data-client="Nova Ventures">
+            <td><div class="invoice-num">INV-2026-032</div></td>
+            <td><div class="client-name">Nova Ventures</div><div class="client-sub">Enterprise retainer</div></td>
+            <td><div class="amount" style="color:var(--accent-green)">$12,000</div></td>
+            <td><div class="due-date">Jan 31, 2026</div></td>
+            <td><div class="due-date">Mar 2, 2026</div></td>
+            <td><span class="badge badge-green">✓ Paid</span></td>
+            <td>—</td>
+            <td><button class="action-btn">View receipt</button></td>
+          </tr>
+          <tr data-status="paid" data-client="Bright Digital">
+            <td><div class="invoice-num">INV-2026-029</div></td>
+            <td><div class="client-name">Bright Digital</div><div class="client-sub">Growth monthly</div></td>
+            <td><div class="amount" style="color:var(--accent-green)">$3,200</div></td>
+            <td><div class="due-date">Jan 15, 2026</div></td>
+            <td><div class="due-date">Feb 14, 2026</div></td>
+            <td><span class="badge badge-green">✓ Paid</span></td>
+            <td>—</td>
+            <td><button class="action-btn">View receipt</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- EXPENSE SECTION -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;margin-top:32px">
+      <div>
+        <div style="font-size:16px;font-weight:600">Expense tracker</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px">Client costs · Freelancer expenses · Upwork pull</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="pullUpwork()">↓ Pull Upwork</button>
+        <button class="btn btn-ghost">↓ Pull Monarch</button>
+        <button class="btn btn-primary" onclick="document.getElementById('expense-modal').classList.add('open')">+ Add expense</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th><th>Client</th><th>Category</th><th>Description</th><th>Source</th><th>Amount</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Mar 28</td>
+            <td><div class="client-name">Acme Corp</div></td>
+            <td><span class="badge badge-purple">Freelancer</span></td>
+            <td>Design sprint — 12h @ $75</td>
+            <td><span class="badge badge-gray">Upwork</span></td>
+            <td><strong>$900</strong></td>
+            <td><button class="action-btn">Edit</button></td>
+          </tr>
+          <tr>
+            <td>Mar 25</td>
+            <td><div class="client-name">Nova Ventures</div></td>
+            <td><span class="badge badge-blue">Software</span></td>
+            <td>Figma seats · Monthly</td>
+            <td><span class="badge badge-gray">Monarch</span></td>
+            <td><strong>$45</strong></td>
+            <td><button class="action-btn">Edit</button></td>
+          </tr>
+          <tr>
+            <td>Mar 22</td>
+            <td><div class="client-name">Bright Digital</div></td>
+            <td><span class="badge badge-purple">Freelancer</span></td>
+            <td>Video edit — 8h @ $60</td>
+            <td><span class="badge badge-gray">Upwork</span></td>
+            <td><strong>$480</strong></td>
+            <td><button class="action-btn">Edit</button></td>
+          </tr>
+          <tr>
+            <td>Mar 18</td>
+            <td><div class="client-name">Solis Health</div></td>
+            <td><span class="badge badge-amber">Ad spend</span></td>
+            <td>Facebook Ads · March campaign</td>
+            <td><span class="badge badge-gray">Manual</span></td>
+            <td><strong>$1,200</strong></td>
+            <td><button class="action-btn">Edit</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- INVOICE DETAIL DRAWER -->
+<div class="drawer" id="detail-drawer">
+  <button class="drawer-close" onclick="document.getElementById('detail-drawer').classList.remove('open')">✕</button>
+  <div class="drawer-title" id="drawer-inv-num">INV-2026-041</div>
+  <div class="drawer-sub">Acme Corp · Enterprise retainer</div>
+  <span class="badge badge-coral" style="margin-bottom:20px;display:inline-flex">⚠ Overdue · 29 days</span>
+  <div class="detail-row"><span class="detail-label">Amount</span><span class="detail-value" style="color:var(--accent-coral);font-size:18px;font-family:'Fraunces',serif">$8,500</span></div>
+  <div class="detail-row"><span class="detail-label">Stripe invoice ID</span><span class="detail-value" style="font-size:12px;color:var(--accent-blue)">in_1OxK2...</span></div>
+  <div class="detail-row"><span class="detail-label">Issued</span><span class="detail-value">Feb 28, 2026</span></div>
+  <div class="detail-row"><span class="detail-label">Due date</span><span class="detail-value">Mar 1, 2026</span></div>
+  <div class="detail-row"><span class="detail-label">Payment terms</span><span class="detail-value">Net-30</span></div>
+  <div class="detail-row"><span class="detail-label">Contact</span><span class="detail-value">billing@acmecorp.com</span></div>
+  <div class="detail-row"><span class="detail-label">Asana task</span><span class="asana-tag">✓ Task #142398</span></div>
+  <div class="timeline">
+    <div class="timeline-title">Activity</div>
+    <div class="timeline-item"><div class="tl-dot" style="background:var(--accent-coral)"></div><div><div class="tl-text">Asana reminder task auto-created</div><div class="tl-date">Mar 15, 2026</div></div></div>
+    <div class="timeline-item"><div class="tl-dot" style="background:var(--accent-amber)"></div><div><div class="tl-text">Invoice emailed to billing@acmecorp.com</div><div class="tl-date">Feb 28, 2026</div></div></div>
+    <div class="timeline-item"><div class="tl-dot" style="background:var(--accent-blue)"></div><div><div class="tl-text">Invoice created in Stripe</div><div class="tl-date">Feb 28, 2026</div></div></div>
+  </div>
+  <div style="margin-top:24px;display:flex;gap:10px">
+    <button class="btn btn-primary" style="flex:1" onclick="markPaid('INV-2026-041');document.getElementById('detail-drawer').classList.remove('open')">Mark as paid</button>
+    <button class="btn btn-ghost">Send reminder</button>
+  </div>
+</div>
+
+<!-- ADD INVOICE MODAL -->
+<div class="modal-overlay" id="add-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-title">New invoice</div>
+    <div class="modal-sub">Will sync to Stripe automatically</div>
+    <div class="form-row"><label class="form-label">Client</label>
+      <select class="form-select"><option>Acme Corp</option><option>Bright Digital</option><option>Nova Ventures</option><option>Solis Health</option><option>Meridian Co.</option></select>
+    </div>
+    <div class="form-row"><label class="form-label">Amount ($)</label><input class="form-input" type="number" placeholder="0.00"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-row"><label class="form-label">Issue date</label><input class="form-input" type="date" value="2026-03-30"/></div>
+      <div class="form-row"><label class="form-label">Due date</label><input class="form-input" type="date" value="2026-04-29"/></div>
+    </div>
+    <div class="form-row"><label class="form-label">Description</label><input class="form-input" placeholder="e.g. Monthly retainer · April 2026"/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="document.getElementById('add-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('add-modal').classList.remove('open')">Create &amp; sync to Stripe</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD EXPENSE MODAL -->
+<div class="modal-overlay" id="expense-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-title">Add expense</div>
+    <div class="modal-sub">Log a client cost or freelancer expense</div>
+    <div class="form-row"><label class="form-label">Client</label>
+      <select class="form-select"><option>Acme Corp</option><option>Bright Digital</option><option>Nova Ventures</option><option>Solis Health</option></select>
+    </div>
+    <div class="form-row"><label class="form-label">Category</label>
+      <select class="form-select"><option>Freelancer</option><option>Software</option><option>Ad spend</option><option>Travel</option><option>Other</option></select>
+    </div>
+    <div class="form-row"><label class="form-label">Amount ($)</label><input class="form-input" type="number" placeholder="0.00"/></div>
+    <div class="form-row"><label class="form-label">Description</label><input class="form-input" placeholder="Brief description..."/></div>
+    <div class="form-row"><label class="form-label">Source</label>
+      <select class="form-select"><option>Manual</option><option>Upwork</option><option>Monarch</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="document.getElementById('expense-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('expense-modal').classList.remove('open')">Save expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:600;display:flex;align-items:center;gap:10px"></div>
+
+<script>
+let currentRole = 'admin';
+
+function setRole(role) {
+  currentRole = role;
+  document.querySelectorAll('.rt-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.rt-btn[onclick="setRole('${role}')"]`).classList.add('active');
+  document.getElementById('role-label').textContent = role === 'admin' ? 'Admin' : 'Employee';
+  document.getElementById('role-gate').style.display = role === 'employee' ? 'block' : 'none';
+  document.getElementById('admin-content').classList.toggle('visible', role === 'admin');
+  document.getElementById('admin-actions').style.display = role === 'admin' ? 'flex' : 'none';
+  document.querySelector('.user-avatar').style.background = role === 'admin'
+    ? 'linear-gradient(135deg,#F0A500,#E85D4A)'
+    : 'linear-gradient(135deg,#3B6FE8,#7C5CBF)';
+}
+
+function showToast(msg, icon='✓') {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span style="font-size:16px">${icon}</span>${msg}`;
+  t.style.transform = 'translateY(0)';
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 3000);
+}
+
+function syncStripe() { showToast('Stripe synced · 24 invoices updated', '⟳'); }
+function markPaid(inv) { showToast(`${inv} marked as paid`, '✓'); }
+function sendReminder(inv) { showToast(`Reminder email sent for ${inv}`, '📧'); }
+function createAsanaTasks() { showToast('3 Asana reminder tasks created', '📋'); }
+function createSingleTask(client) { showToast(`Asana task created for ${client}`, '📋'); }
+function pullUpwork() { showToast('Upwork expenses pulled · 3 new entries', '↓'); }
+
+function openDrawer(inv) {
+  document.getElementById('detail-drawer').classList.add('open');
+  document.getElementById('drawer-inv-num').textContent = inv;
+}
+
+function filterTable(query) {
+  const rows = document.querySelectorAll('#invoice-table tbody tr');
+  rows.forEach(r => {
+    r.style.display = r.textContent.toLowerCase().includes(query.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function filterStatus(status, el) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const rows = document.querySelectorAll('#invoice-table tbody tr');
+  rows.forEach(r => {
+    r.style.display = (status === 'all' || r.dataset.status === status) ? '' : 'none';
+  });
+}
+
+// init
+setRole('admin');
+</script>
+</body>
+</html>

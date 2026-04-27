@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+/* ─── IDC Modern SaaS Design System ─── */
+:root {
+  /* Core layout */
+  --bg: #F9FAFB;
+  --surface: #FFFFFF;
+  --sidebar: #FFFFFF;
+  --sidebar-text: #4B5563;
+  --text: #111827;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+
+  /* IDC Brand Accents */
+  --accent-primary: #925FF0; /* IDC Purple */
+  --accent-secondary: #FECB02; /* IDC Yellow */
+
+  /* Semantic UI Colors */
+  --accent-blue: #925FF0;  /* Aliased to primary purple for the app */
+  --accent-green: #10B981;
+  --accent-amber: #FECB02; /* Aliased to secondary yellow */
+  --accent-coral: #EF4444;
+  --accent-purple: #8B5CF6;
+
+  /* Medals */
+  --gold: #FECB02;
+  --silver: #9CA3AF;
+  --bronze: #B45309;
+
+  /* Background/Border/Text Sets */
+  --blue-bg: #F3E8FF;
+  --blue-border: #E9D5FF;
+  --blue-text: #7E22CE;
+
+  --green-bg: #ECFDF5;
+  --green-border: #D1FAE5;
+  --green-text: #047857;
+
+  --coral-bg: #FEF2F2;
+  --coral-border: #FEE2E2;
+  --coral-text: #B91C1C;
+
+  --amber-bg: #FEFCE8;
+  --amber-border: #FEF08A;
+  --amber-text: #A16207;
+
+  --purple-bg: #F5F3FF;
+  --purple-border: #EDE9FE;
+  --purple-text: #6D28D9;
+
+  /* Radii */
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  /* Layout */
+  --sidebar-width: 250px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-border-c: var(--border);
+  
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-green: var(--accent-green);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-coral: var(--accent-coral);
+  --color-accent-purple: var(--accent-purple);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-secondary: var(--accent-secondary);
+
+  --color-blue-bg: var(--blue-bg);
+  --color-blue-border: var(--blue-border);
+  --color-blue-text: var(--blue-text);
+  
+  --color-green-bg: var(--green-bg);
+  --color-green-border: var(--green-border);
+  --color-green-text: var(--green-text);
+  
+  --color-coral-bg: var(--coral-bg);
+  --color-coral-border: var(--coral-border);
+  --color-coral-text: var(--coral-text);
+  
+  --color-amber-bg: var(--amber-bg);
+  --color-amber-border: var(--amber-border);
+  --color-amber-text: var(--amber-text);
+  
+  --color-purple-bg: var(--purple-bg);
+  --color-purple-border: var(--purple-border);
+  --color-purple-text: var(--purple-text);
+
+  --font-sans: "Inter", var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", var(--font-serif), ui-serif, serif;
+}
+
+/* ─── Base ─── */
+html { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  min-height: 100%;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ─── Animations ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-up { animation: fadeUp 0.3s ease both; }
+.animate-fade-in { animation: fadeIn 0.2s ease both; }
+.animate-slide-in-right { animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.animate-scale-in { animation: scaleIn 0.25s cubic-bezier(0.34, 1.4, 0.64, 1) both; }
+
+.stagger-1 { animation-delay: 0.04s; }
+.stagger-2 { animation-delay: 0.08s; }
+.stagger-3 { animation-delay: 0.12s; }
+.stagger-4 { animation-delay: 0.16s; }
+.stagger-5 { animation-delay: 0.20s; }
+.stagger-6 { animation-delay: 0.24s; }
+
+/* ─── Cards & Shadows for SaaS look ─── */
+.saas-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+.saas-shadow-hover:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}

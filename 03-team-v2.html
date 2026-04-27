@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+  --blue-bg:#EBF0FD;--blue-border:#C0D0F8;--blue-text:#2850C0;
+  --green-bg:#E8F7F2;--green-border:#A8DEC8;--green-text:#1A7A57;
+  --coral-bg:#FDEDEB;--coral-border:#F5BDB5;--coral-text:#B03020;
+  --amber-bg:#FEF3DC;--amber-border:#F0D490;--amber-text:#A06500;
+  --purple-bg:#F0EDFA;--purple-border:#C8B8F0;--purple-text:#5C3E9A;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.nav-item.admin-only.active{border-left-color:var(--accent-amber)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto;letter-spacing:0.06em}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3B6FE8,#7C5CBF);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(59,111,232,0.2);color:#7EB8FF;border-color:rgba(59,111,232,0.3)}
+
+/* ── MAIN ── */
+.main{margin-left:220px;flex:1;padding:32px;max-width:1100px}
+.page-header{margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-header h1{font-family:'Fraunces',serif;font-size:36px;font-weight:300;letter-spacing:-0.5px;line-height:1}
+.page-header h1 em{font-style:italic;color:var(--accent-blue)}
+.page-header p{color:var(--muted);margin-top:6px;font-size:13px}
+
+/* ── CONTROLS ── */
+.controls{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.search-wrap{position:relative}
+.search-input{padding:9px 14px 9px 36px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;outline:none;width:260px;transition:border-color 0.15s;color:var(--text)}
+.search-input:focus{border-color:var(--accent-blue)}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none}
+.dept-pills{display:flex;gap:5px;flex-wrap:wrap}
+.dp{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s;font-family:inherit}
+.dp.active{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue)}
+.view-toggle{display:flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px;margin-left:auto}
+.vt{padding:6px 13px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all 0.15s;font-family:inherit}
+.vt.active{background:var(--accent-blue);color:#fff}
+
+/* ── STATUS LEGEND ── */
+.legend{display:flex;align-items:center;gap:14px;margin-bottom:20px;font-size:11px;color:var(--muted)}
+.leg-item{display:flex;align-items:center;gap:5px}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ── TEAM GRID ── */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.member-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;transition:all 0.2s;cursor:pointer;animation:fadeUp 0.3s ease both}
+.member-card:hover{border-color:#C8C0B0;box-shadow:0 4px 20px rgba(0,0,0,0.07);transform:translateY(-2px)}
+.card-accent{height:4px;border-radius:var(--radius) var(--radius) 0 0}
+.card-top{padding:20px 20px 14px;display:flex;align-items:flex-start;gap:14px}
+.avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#fff;flex-shrink:0;position:relative}
+.status-dot{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;border:2px solid var(--surface)}
+.sd-in{background:var(--accent-green)}
+.sd-remote{background:var(--accent-blue)}
+.sd-out{background:var(--muted)}
+.member-name{font-size:15px;font-weight:600;margin-bottom:2px}
+.member-role{font-size:12px;color:var(--muted);margin-bottom:8px}
+.dept-chip{display:inline-flex;align-items:center;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;border:1px solid transparent}
+.card-body{padding:0 20px 16px}
+.bio-text{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:12px}
+.skills-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.skill{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border);color:var(--muted)}
+.card-footer{padding:13px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.avail-chip{font-size:11px;display:flex;align-items:center;gap:5px;color:var(--muted)}
+.soc-links{display:flex;gap:6px}
+.soc-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:11px;font-weight:600;transition:all 0.15s}
+.soc-btn:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+
+/* ── LIST VIEW ── */
+.team-list{display:none}
+.team-list.on{display:block}
+.tg.off{display:none}
+.list-wrap{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+.list-row{display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s}
+.list-row:last-child{border-bottom:none}
+.list-row:hover{background:var(--bg)}
+.list-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.list-name{font-weight:600;font-size:14px}
+.list-role-t{font-size:11px;color:var(--muted)}
+.list-skills{display:flex;gap:5px;flex:1;flex-wrap:wrap}
+
+/* ── DRAWER ── */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.4);backdrop-filter:blur(3px);z-index:200}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;right:-520px;width:500px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;overflow-y:auto;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.08)}
+.drawer.open{right:0}
+.drawer-close{position:absolute;top:20px;right:20px;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);z-index:1;transition:all 0.15s}
+.drawer-close:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.drawer-hero{padding:36px 32px 24px;border-bottom:1px solid var(--border)}
+.drawer-top{display:flex;gap:18px;align-items:flex-start;margin-bottom:16px}
+.drawer-av{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;color:#fff;flex-shrink:0}
+.drawer-name{font-family:'Fraunces',serif;font-size:26px;font-weight:300;line-height:1;margin-bottom:4px}
+.drawer-role-t{font-size:13px;color:var(--muted);margin-bottom:10px}
+.drawer-chips{display:flex;gap:6px;flex-wrap:wrap}
+.drawer-body{padding:24px 32px}
+.sec-lbl{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:10px;margin-top:20px}
+.sec-lbl:first-child{margin-top:0}
+.drawer-bio{font-size:13px;line-height:1.75}
+.stat-mini-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sm{border-radius:var(--radius-sm);padding:14px;border:1px solid;text-align:center}
+.sm-val{font-family:'Fraunces',serif;font-size:22px;font-weight:600;letter-spacing:-0.5px;line-height:1;margin-bottom:3px}
+.sm-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted)}
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.comp-item{background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border)}
+.comp-name{font-size:12px;font-weight:500;margin-bottom:5px}
+.comp-dots{display:flex;gap:3px;margin-bottom:3px}
+.cdot{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.cdot.filled{background:var(--accent-blue)}
+.cdot.primary-dot{background:var(--accent-green)}
+.comp-type{font-size:10px;color:var(--muted)}
+.avail-row{display:flex;gap:7px;flex-wrap:wrap}
+.avail-day{padding:5px 11px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--bg);color:var(--muted)}
+.avail-day.avail{background:var(--green-bg);border-color:var(--green-border);color:var(--green-text)}
+.avail-day.ooo{background:var(--coral-bg);border-color:var(--coral-border);color:var(--coral-text)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s}
+.btn-primary{background:var(--accent-blue);color:#fff}
+.btn-primary:hover{background:#2A5ED4}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.member-card:nth-child(2){animation-delay:.04s}
+.member-card:nth-child(3){animation-delay:.08s}
+.member-card:nth-child(4){animation-delay:.12s}
+.member-card:nth-child(5){animation-delay:.16s}
+.member-card:nth-child(6){animation-delay:.20s}
+.member-card:nth-child(7){animation-delay:.24s}
+.member-card:nth-child(8){animation-delay:.28s}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="01-dashboard-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="02-schedule-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/><path d="M11 7c2 0 4 1 4 4"/><circle cx="12" cy="3.5" r="2"/></svg>Team</a>
+      <a class="nav-item" href="04-leaderboard-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+      <a class="nav-item" href="../idc-portal/05-handbook.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h4M5 8h4M5 11h2"/></svg>Handbook</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="03-ops-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>Client Budgets</a>
+      <a class="nav-item" href="03-ops-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+      <a class="nav-item" href="../idc-portal/06-partners.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l4-4 4 4 4-4"/></svg>Partners</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only" href="admin/01-invoices-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/02-sales-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/03-analytics-v2.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="../idc-portal/07-hiring.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="role-toggle"><button class="rt-btn active">Employee</button><button class="rt-btn">Admin</button></div>
+  <div class="sidebar-user"><div class="user-avatar">JL</div><div><div class="user-name">Jamie L.</div><div class="user-role">Designer</div></div></div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div>
+      <h1>Meet the <em>Team</em></h1>
+      <p>8 people · 4 departments · Hover a card to connect</p>
+    </div>
+    <button class="btn btn-ghost">+ Add member</button>
+  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input class="search-input" placeholder="Search name, role, skill…" oninput="filterTeam(this.value)"/>
+    </div>
+    <div class="dept-pills">
+      <button class="dp active" onclick="filterDept('all',this)">All</button>
+      <button class="dp" onclick="filterDept('design',this)">Design</button>
+      <button class="dp" onclick="filterDept('strategy',this)">Strategy</button>
+      <button class="dp" onclick="filterDept('video',this)">Video</button>
+      <button class="dp" onclick="filterDept('ops',this)">Ops</button>
+    </div>
+    <div class="view-toggle">
+      <button class="vt active" onclick="setView('grid',this)">Grid</button>
+      <button class="vt" onclick="setView('list',this)">List</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot sd-in"></div>In office</div>
+    <div class="leg-item"><div class="leg-dot sd-remote"></div>Remote</div>
+    <div class="leg-item"><div class="leg-dot sd-out"></div>OOO</div>
+  </div>
+
+  <!-- GRID -->
+  <div class="team-grid tg" id="tg">
+
+    <!-- Jamie Lee — Design -->
+    <div class="member-card" data-dept="design" onclick="openD('Jamie Lee','Senior Designer','design','JL','linear-gradient(135deg,#3B6FE8,#7C5CBF)','in')">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--accent-blue),var(--accent-purple))"></div>
+      <div class="card-top">
+        <div class="avatar" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">JL<div class="status-dot sd-in"></div></div>
+        <div>
+          <div class="member-name">Jamie Lee</div>
+          <div class="member-role">Senior Designer</div>
+          <div class="dept-chip" style="background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border)">Design</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bio-text">Brand identity specialist with 6 years at IDC. Led rebrands for Acme Corp and Nova Ventures. Obsessed with type and motion.</div>
+        <div class="skills-row"><span class="skill">Figma</span><span class="skill">After Effects</span><span class="skill">Brand</span><span class="skill">Motion</span></div>
+      </div>
+      <div class="card-footer">
+        <div class="avail-chip"><div class="status-dot sd-in" style="position:static;border:none"></div>In office today</div>
+        <div class="soc-links"><div class="soc-btn">in</div><div class="soc-btn">Be</div></div>
+      </div>
+    </div>
+
+    <!-- Haley Lin — Strategy -->
+    <div class="member-card" data-dept="strategy" onclick="openD('Haley Lin','Strategy Lead','strategy','HL','linear-gradient(135deg,#2DAE7F,#3B6FE8)','remote')">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--accent-green),var(--accent-blue))"></div>
+      <div class="card-top">
+        <div class="avatar" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">HL<div class="status-dot sd-remote"></div></div>
+        <div>
+          <div class="member-name">Haley Lin</div>
+          <div class="member-role">Strategy Lead</div>
+          <div class="dept-chip" style="background:var(--green-bg);color:var(--green-text);border-color:var(--green-border)">Strategy</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bio-text">Growth strategist and client lead. Manages 5 key accounts and leads the sales pipeline. Former consultant at Deloitte Digital.</div>
+        <div class="skills-row"><span class="skill">Growth</span><span class="skill">Analytics</span><span class="skill">Asana</span><span class="skill">Decks</span></div>
+      </div>
+      <div class="card-footer">
+        <div class="avail-chip"><div class="status-dot sd-remote" style="position:static;border:none"></div>Remote today</div>
+        <div class="soc-links"><div class="soc-btn">in</div></div>
+      </div>
+    </div>
+
+    <!-- Roger Grant — Video -->
+    <div class="member-card" data-dept="video" onclick="openD('Roger Grant','Video Director','video','RG','linear-gradient(135deg,#F0A500,#E85D4A)','in')">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--accent-amber),var(--accent-coral))"></div>
+      <div class="card-top">
+        <div class="avatar" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG<div class="status-dot sd-in"></div></div>
+        <div>
+          <div class="member-name">Roger Grant</div>
+          <div class="member-role">Video Director</div>
+          <div class="dept-chip" style="background:var(--coral-bg);color:var(--coral-text);border-color:var(--coral-border)">Video</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bio-text">Storyteller at heart. Directs, edits, and scores. Has shot campaigns for 20+ brands. Works best with a cold brew in hand.</div>
+        <div class="skills-row"><span class="skill">Premiere</span><span class="skill">DaVinci</span><span class="skill">Directing</span><span class="skill">Audio</span></div>
+      </div>
+      <div class="card-footer">
+        <div class="avail-chip"><div class="status-dot sd-in" style="position:static;border:none"></div>In office today</div>
+        <div class="soc-links"><div class="soc-btn">in</div><div class="soc-btn">▶</div></div>
+      </div>
+    </div>
+
+    <!-- Sofia Reyes — Design -->
+    <div class="member-card" data-dept="design" onclick="openD('Sofia Reyes','UI/UX Designer','design','SR','linear-gradient(135deg,#7C5CBF,#E85D4A)','remote')">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--accent-purple),var(--accent-coral))"></div>
+      <div class="card-top">
+        <div class="avatar" style="background:linear-gradient(135deg,#7C5CBF,#E85D4A)">SR<div class="status-dot sd-remote"></div></div>
+        <div>
+          <div class="member-name">Sofia Reyes</div>
+          <div class="member-role">UI/UX Designer</div>
+          <div class="dept-chip" style="background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border)">Design</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bio-text">Builds beautiful, usable digital experiences. Leads all Webflow builds and prototyping for client sites. Speaks fluent CSS.</div>
+        <div class="skills-row"><span class="skill">Figma</span><span class="skill">Webflow</span><span class="skill">Prototyping</span><span class="skill">CSS</span></div>
+      </div>
+      <div class="card-footer">
+        <div class="avail-chip"><div class="status-dot sd-remote" style="position:static;border:none"></div>Remote today</div>
+        <div class="soc-links"><div class="soc-btn">in</div><div class="soc-btn">Be</div></div>
+      </div>
+    </div>
+
+    <!-- Jordan Mills — Ops -->
+    <div class="member-card" data-dept="ops" onclick="openD('Jordan Mills','Ops Manager','ops','JM','linear-gradient(135deg,#2DAE7F,#F0A500)','in')">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--accent-green),var(--accent-amber))"></div>
+      <div class="card-top">
+        <div class="avatar" style="background:linear-gradient(135deg,#2DAE7F,#F0A500)">JM<div class="status-dot sd-in"></div></div>
+        <div>
+          <div class="member-name">Jordan Mills</div>
+          <div class="member-role">Ops Manager</div>
+          <div class="dept-chip" style="background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border)">Ops</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bio-text">Keeps the trains running. Manages capacity, invoices, and tooling. Introduced Asana automation that saved 6 hours/week.</div>
+        <div class="skills-row"><span class="skill">Asana</span><span class="skill">Finance</span><span class="skill">Systems</span><span class="skill">Notion</span></div>
+      </div>
+      <div class="card-footer">
+        <div class="avail-chip"><div class="status-dot sd-in" style="position:static;border:none"></div>In office today</div>
+        <div class="soc-links"><div class="soc-btn">in</div></div>
+      </div>
+    </div>
+
+    <!-- Priya Nair — Strategy -->
+    <div class="member-card" data-dept="strategy" onclick="openD('Priya Nair','Content Strategist','strategy','PN','linear-gradient(135deg,#E85D4A,#7C5CBF)','out')">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--accent-coral),var(--accent-purple))"></div>
+      <div class="card-top">
+        <div class="avatar" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">PN<div class="status-dot sd-out"></div></div>
+        <div>
+          <div class="member-name">Priya Nair</div>
+          <div class="member-role">Content Strategist</div>
+          <div class="dept-chip" style="background:var(--green-bg);color:var(--green-text);border-color:var(--green-border)">Strategy</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bio-text">Crafts narratives that convert. Manages social calendars for 4 clients and writes copy that doesn't sound like AI wrote it.</div>
+        <div class="skills-row"><span class="skill">Copywriting</span><span class="skill">SEO</span><span class="skill">Social</span><span class="skill">Email</span></div>
+      </div>
+      <div class="card-footer">
+        <div class="avail-chip"><div class="status-dot sd-out" style="position:static;border:none"></div>OOO — back Apr 3</div>
+        <div class="soc-links"><div class="soc-btn">in</div></div>
+      </div>
+    </div>
+
+    <!-- Marcus Webb — Video -->
+    <div class="member-card" data-dept="video" onclick="openD('Marcus Webb','Motion Designer','video','MW','linear-gradient(135deg,#3B6FE8,#2DAE7F)','in')">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--accent-blue),var(--accent-green))"></div>
+      <div class="card-top">
+        <div class="avatar" style="background:linear-gradient(135deg,#3B6FE8,#2DAE7F)">MW<div class="status-dot sd-in"></div></div>
+        <div>
+          <div class="member-name">Marcus Webb</div>
+          <div class="member-role">Motion Designer</div>
+          <div class="dept-chip" style="background:var(--coral-bg);color:var(--coral-text);border-color:var(--coral-border)">Video</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bio-text">Brings static designs to life. After Effects wizard, Lottie enthusiast. Currently obsessed with 3D motion and product renders.</div>
+        <div class="skills-row"><span class="skill">After Effects</span><span class="skill">Cinema 4D</span><span class="skill">Lottie</span></div>
+      </div>
+      <div class="card-footer">
+        <div class="avail-chip"><div class="status-dot sd-in" style="position:static;border:none"></div>In office today</div>
+        <div class="soc-links"><div class="soc-btn">in</div><div class="soc-btn">Be</div></div>
+      </div>
+    </div>
+
+    <!-- Dana Cruz — Ops -->
+    <div class="member-card" data-dept="ops" onclick="openD('Dana Cruz','Account Manager','ops','DC','linear-gradient(135deg,#F0A500,#7C5CBF)','remote')">
+      <div class="card-accent" style="background:linear-gradient(90deg,var(--accent-amber),var(--accent-purple))"></div>
+      <div class="card-top">
+        <div class="avatar" style="background:linear-gradient(135deg,#F0A500,#7C5CBF)">DC<div class="status-dot sd-remote"></div></div>
+        <div>
+          <div class="member-name">Dana Cruz</div>
+          <div class="member-role">Account Manager</div>
+          <div class="dept-chip" style="background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border)">Ops</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bio-text">First point of contact for 6 clients. Bridges creative and client expectations. Known for turning difficult feedback into clear briefs.</div>
+        <div class="skills-row"><span class="skill">Client comms</span><span class="skill">Asana</span><span class="skill">Reporting</span></div>
+      </div>
+      <div class="card-footer">
+        <div class="avail-chip"><div class="status-dot sd-remote" style="position:static;border:none"></div>Remote today</div>
+        <div class="soc-links"><div class="soc-btn">in</div></div>
+      </div>
+    </div>
+
+  </div><!-- end grid -->
+
+  <!-- LIST VIEW -->
+  <div class="team-list" id="tl">
+    <div class="list-wrap">
+      <div class="list-row" data-dept="design" onclick="openD('Jamie Lee','Senior Designer','design','JL','linear-gradient(135deg,#3B6FE8,#7C5CBF)','in')"><div class="list-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">JL</div><div style="width:150px;flex-shrink:0"><div class="list-name">Jamie Lee</div><div class="list-role-t">Senior Designer</div></div><div class="dept-chip" style="background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);flex-shrink:0">Design</div><div class="list-skills"><span class="skill">Figma</span><span class="skill">After Effects</span><span class="skill">Brand</span></div><div class="avail-chip" style="flex-shrink:0"><div class="status-dot sd-in" style="position:static;border:none"></div>In office</div></div>
+      <div class="list-row" data-dept="strategy" onclick="openD('Haley Lin','Strategy Lead','strategy','HL','linear-gradient(135deg,#2DAE7F,#3B6FE8)','remote')"><div class="list-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">HL</div><div style="width:150px;flex-shrink:0"><div class="list-name">Haley Lin</div><div class="list-role-t">Strategy Lead</div></div><div class="dept-chip" style="background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);flex-shrink:0">Strategy</div><div class="list-skills"><span class="skill">Growth</span><span class="skill">Analytics</span><span class="skill">Asana</span></div><div class="avail-chip" style="flex-shrink:0"><div class="status-dot sd-remote" style="position:static;border:none"></div>Remote</div></div>
+      <div class="list-row" data-dept="video" onclick="openD('Roger Grant','Video Director','video','RG','linear-gradient(135deg,#F0A500,#E85D4A)','in')"><div class="list-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div><div style="width:150px;flex-shrink:0"><div class="list-name">Roger Grant</div><div class="list-role-t">Video Director</div></div><div class="dept-chip" style="background:var(--coral-bg);color:var(--coral-text);border-color:var(--coral-border);flex-shrink:0">Video</div><div class="list-skills"><span class="skill">Premiere</span><span class="skill">DaVinci</span><span class="skill">Directing</span></div><div class="avail-chip" style="flex-shrink:0"><div class="status-dot sd-in" style="position:static;border:none"></div>In office</div></div>
+      <div class="list-row" data-dept="design" onclick="openD('Sofia Reyes','UI/UX Designer','design','SR','linear-gradient(135deg,#7C5CBF,#E85D4A)','remote')"><div class="list-av" style="background:linear-gradient(135deg,#7C5CBF,#E85D4A)">SR</div><div style="width:150px;flex-shrink:0"><div class="list-name">Sofia Reyes</div><div class="list-role-t">UI/UX Designer</div></div><div class="dept-chip" style="background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border);flex-shrink:0">Design</div><div class="list-skills"><span class="skill">Figma</span><span class="skill">Webflow</span><span class="skill">CSS</span></div><div class="avail-chip" style="flex-shrink:0"><div class="status-dot sd-remote" style="position:static;border:none"></div>Remote</div></div>
+      <div class="list-row" data-dept="ops" onclick="openD('Jordan Mills','Ops Manager','ops','JM','linear-gradient(135deg,#2DAE7F,#F0A500)','in')"><div class="list-av" style="background:linear-gradient(135deg,#2DAE7F,#F0A500)">JM</div><div style="width:150px;flex-shrink:0"><div class="list-name">Jordan Mills</div><div class="list-role-t">Ops Manager</div></div><div class="dept-chip" style="background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border);flex-shrink:0">Ops</div><div class="list-skills"><span class="skill">Asana</span><span class="skill">Finance</span><span class="skill">Systems</span></div><div class="avail-chip" style="flex-shrink:0"><div class="status-dot sd-in" style="position:static;border:none"></div>In office</div></div>
+      <div class="list-row" data-dept="strategy"><div class="list-av" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">PN</div><div style="width:150px;flex-shrink:0"><div class="list-name">Priya Nair</div><div class="list-role-t">Content Strategist</div></div><div class="dept-chip" style="background:var(--green-bg);color:var(--green-text);border-color:var(--green-border);flex-shrink:0">Strategy</div><div class="list-skills"><span class="skill">Copywriting</span><span class="skill">SEO</span><span class="skill">Social</span></div><div class="avail-chip" style="flex-shrink:0"><div class="status-dot sd-out" style="position:static;border:none"></div>OOO</div></div>
+      <div class="list-row" data-dept="video"><div class="list-av" style="background:linear-gradient(135deg,#3B6FE8,#2DAE7F)">MW</div><div style="width:150px;flex-shrink:0"><div class="list-name">Marcus Webb</div><div class="list-role-t">Motion Designer</div></div><div class="dept-chip" style="background:var(--coral-bg);color:var(--coral-text);border-color:var(--coral-border);flex-shrink:0">Video</div><div class="list-skills"><span class="skill">After Effects</span><span class="skill">Cinema 4D</span></div><div class="avail-chip" style="flex-shrink:0"><div class="status-dot sd-in" style="position:static;border:none"></div>In office</div></div>
+      <div class="list-row" data-dept="ops"><div class="list-av" style="background:linear-gradient(135deg,#F0A500,#7C5CBF)">DC</div><div style="width:150px;flex-shrink:0"><div class="list-name">Dana Cruz</div><div class="list-role-t">Account Manager</div></div><div class="dept-chip" style="background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border);flex-shrink:0">Ops</div><div class="list-skills"><span class="skill">Client comms</span><span class="skill">Reporting</span></div><div class="avail-chip" style="flex-shrink:0"><div class="status-dot sd-remote" style="position:static;border:none"></div>Remote</div></div>
+    </div>
+  </div>
+</main>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="dov" onclick="closeD()"></div>
+<div class="drawer" id="drw">
+  <button class="drawer-close" onclick="closeD()">✕</button>
+  <div class="drawer-hero">
+    <div class="drawer-top">
+      <div class="drawer-av" id="d-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">JL</div>
+      <div>
+        <div class="drawer-name" id="d-name">Jamie Lee</div>
+        <div class="drawer-role-t" id="d-role">Senior Designer · Design</div>
+        <div class="drawer-chips" id="d-chips">
+          <span style="font-size:11px;display:flex;align-items:center;gap:4px;color:var(--accent-green)"><span style="width:7px;height:7px;border-radius:50%;background:var(--accent-green);display:inline-block"></span>In office · 6 yrs at IDC</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-body">
+    <div class="sec-lbl">About</div>
+    <div class="drawer-bio">Brand identity specialist with 6 years at IDC. Led rebrands for Acme Corp and Nova Ventures. Obsessed with type, motion, and the perfect typeface pairing. Mentor to junior designers on the team.</div>
+    <div class="sec-lbl">This week</div>
+    <div class="stat-mini-row">
+      <div class="sm" style="background:var(--blue-bg);border-color:var(--blue-border)"><div class="sm-val" style="color:var(--blue-text)">34h</div><div class="sm-lbl">Logged</div></div>
+      <div class="sm" style="background:var(--green-bg);border-color:var(--green-border)"><div class="sm-val" style="color:var(--green-text)">92%</div><div class="sm-lbl">Utilization</div></div>
+      <div class="sm" style="background:var(--amber-bg);border-color:var(--amber-border)"><div class="sm-val" style="color:var(--amber-text)">5</div><div class="sm-lbl">Clients</div></div>
+    </div>
+    <div class="sec-lbl">Competencies</div>
+    <div class="comp-grid">
+      <div class="comp-item"><div class="comp-name">Figma</div><div class="comp-dots"><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div></div><div class="comp-type">Primary · Expert</div></div>
+      <div class="comp-item"><div class="comp-name">After Effects</div><div class="comp-dots"><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot filled"></div></div><div class="comp-type">Primary · Advanced</div></div>
+      <div class="comp-item"><div class="comp-name">Illustrator</div><div class="comp-dots"><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot filled"></div><div class="cdot"></div></div><div class="comp-type">Secondary</div></div>
+      <div class="comp-item"><div class="comp-name">Webflow</div><div class="comp-dots"><div class="cdot primary-dot"></div><div class="cdot primary-dot"></div><div class="cdot filled"></div><div class="cdot"></div><div class="cdot"></div></div><div class="comp-type">Secondary</div></div>
+    </div>
+    <div class="sec-lbl">Availability this week</div>
+    <div class="avail-row">
+      <div class="avail-day avail">Mon ✓</div>
+      <div class="avail-day avail">Tue ✓</div>
+      <div class="avail-day">Wed</div>
+      <div class="avail-day avail">Thu ✓</div>
+      <div class="avail-day ooo">Fri OOO</div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:24px">
+      <button class="btn btn-primary" style="flex:1">Message Jamie</button>
+      <button class="btn btn-ghost">View schedule</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STATUS_LABEL = { in:'In office today', remote:'Remote today', out:'OOO' }
+const STATUS_COLOR = { in:'var(--accent-green)', remote:'var(--accent-blue)', out:'var(--muted)' }
+const DEPT_STYLE = {
+  design:   'background:var(--blue-bg);color:var(--blue-text);border-color:var(--blue-border)',
+  strategy: 'background:var(--green-bg);color:var(--green-text);border-color:var(--green-border)',
+  video:    'background:var(--coral-bg);color:var(--coral-text);border-color:var(--coral-border)',
+  ops:      'background:var(--amber-bg);color:var(--amber-text);border-color:var(--amber-border)',
+}
+function openD(name,role,dept,initials,grad,status){
+  document.getElementById('d-name').textContent = name
+  document.getElementById('d-role').textContent = role+' · '+dept.charAt(0).toUpperCase()+dept.slice(1)
+  const av = document.getElementById('d-av')
+  av.textContent = initials; av.style.background = grad
+  document.getElementById('d-chips').innerHTML = `<span style="font-size:11px;display:flex;align-items:center;gap:4px;color:${STATUS_COLOR[status]}"><span style="width:7px;height:7px;border-radius:50%;background:${STATUS_COLOR[status]};display:inline-block"></span>${STATUS_LABEL[status]}</span>`
+  document.getElementById('drw').classList.add('open')
+  document.getElementById('dov').classList.add('open')
+}
+function closeD(){
+  document.getElementById('drw').classList.remove('open')
+  document.getElementById('dov').classList.remove('open')
+}
+function setView(v,el){
+  document.querySelectorAll('.vt').forEach(b=>b.classList.remove('active')); el.classList.add('active')
+  document.getElementById('tg').classList.toggle('off', v==='list')
+  document.getElementById('tl').classList.toggle('on', v==='list')
+}
+function filterDept(d,el){
+  document.querySelectorAll('.dp').forEach(b=>b.classList.remove('active')); el.classList.add('active')
+  document.querySelectorAll('.member-card,.list-row').forEach(c=>{
+    c.style.display=(d==='all'||c.dataset.dept===d)?'':'none'
+  })
+}
+function filterTeam(q){
+  q=q.toLowerCase()
+  document.querySelectorAll('.member-card,.list-row').forEach(c=>{
+    c.style.display=c.textContent.toLowerCase().includes(q)?'':'none'
+  })
+}
+</script>
+</body>
+</html>

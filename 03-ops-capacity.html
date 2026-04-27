@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Ops: Budgets & Capacity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px}
+.nav-section{margin-bottom:24px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;font-weight:400;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item .icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3B6FE8,#7C5CBF);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.main{margin-left:220px;flex:1;padding:32px;max-width:1200px}
+.page-header{margin-bottom:28px}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--accent-blue)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;width:fit-content;margin-bottom:24px}
+.tab{padding:8px 18px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;color:var(--muted)}
+.tab.active{background:var(--accent-blue);color:#fff}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fadeUp 0.2s ease}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-size:16px;font-weight:600}
+.section-sub{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:18px 20px;border:1px solid var(--border);position:relative;overflow:hidden}
+.stat-card .accent-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:6px}
+.stat-value{font-family:'Fraunces',serif;font-size:26px;font-weight:600;letter-spacing:-0.5px;line-height:1}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:5px}
+
+/* TABLE */
+.table-wrap{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:20px}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg)}
+th{padding:12px 16px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border)}
+td{padding:13px 16px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFAF8}
+.client-name{font-weight:600;color:var(--text)}
+.client-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.hours-cell{font-family:'DM Sans',sans-serif;font-weight:500}
+
+/* USAGE BAR */
+.usage-wrap{display:flex;align-items:center;gap:10px}
+.usage-bar-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;min-width:80px}
+.usage-bar-fill{height:100%;border-radius:3px;transition:width 0.3s}
+.usage-pct{font-size:11px;font-weight:600;width:32px;text-align:right}
+.over{color:var(--accent-coral)}
+.ok{color:var(--accent-green)}
+.warn{color:var(--accent-amber)}
+
+/* ASSIGNEE BADGES */
+.assignee-list{display:flex;gap:-4px}
+.assignee-av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;border:2px solid var(--surface);margin-left:-4px;flex-shrink:0}
+.assignee-av:first-child{margin-left:0}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500}
+.badge-green{background:#E8F7F2;color:#1A7A57}
+.badge-amber{background:#FEF3DC;color:#A06500}
+.badge-coral{background:#FDEDEB;color:#B03020}
+.badge-blue{background:#EBF0FD;color:#2850C0}
+.badge-gray{background:#F0EEE8;color:var(--muted)}
+
+/* CAPACITY TABLE */
+.capacity-row{display:flex;align-items:center;gap:0;padding:14px 0;border-bottom:1px solid var(--border)}
+.capacity-row:last-child{border-bottom:none}
+.cap-member{display:flex;align-items:center;gap:10px;width:180px;flex-shrink:0}
+.cap-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.cap-name{font-size:13px;font-weight:500}
+.cap-title{font-size:11px;color:var(--muted)}
+.cap-meta{display:flex;flex-direction:column;gap:3px;width:120px;flex-shrink:0}
+.cap-tag{font-size:10px;padding:2px 6px;border-radius:4px;width:fit-content}
+.cap-hours{flex:1;padding:0 16px}
+.cap-bar-wrap{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.cap-bar-bg{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;position:relative}
+.cap-bar-fill{height:100%;border-radius:4px;position:absolute;top:0;left:0;transition:width 0.4s}
+.cap-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.cap-nums{width:120px;flex-shrink:0;text-align:right}
+.cap-num-val{font-family:'Fraunces',serif;font-size:20px;font-weight:600}
+.cap-num-sub{font-size:10px;color:var(--muted)}
+
+/* WEEK SELECTOR */
+.week-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.week-nav button{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px}
+.week-nav button:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.week-nav .wlabel{font-size:14px;font-weight:500}
+
+/* ASSIGNEE SECTION */
+.assignee-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:18px 20px;margin-bottom:12px;display:flex;align-items:center;gap:16px;transition:all 0.15s}
+.assignee-card:hover{border-color:var(--accent-blue);box-shadow:0 2px 12px rgba(59,111,232,0.08)}
+.ac-client{font-weight:600;font-size:14px;margin-bottom:4px}
+.ac-sub{font-size:12px;color:var(--muted)}
+.ac-assignees{display:flex;gap:8px;flex-wrap:wrap}
+.ac-chip{display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:20px;padding:4px 10px;font-size:12px}
+.ac-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
+
+/* COMPETENCY GRID */
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.comp-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:16px}
+.comp-member{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.comp-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+.comp-name{font-size:13px;font-weight:600}
+.comp-title{font-size:11px;color:var(--muted)}
+.comp-tool{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.tool-name{font-size:12px;color:var(--text)}
+.tool-primary{font-size:10px;background:#E8F0FD;color:#2050B0;padding:2px 6px;border-radius:4px}
+.tool-secondary{font-size:10px;background:#F0EEE8;color:var(--muted);padding:2px 6px;border-radius:4px}
+.comp-dots{display:flex;gap:3px}
+.comp-dot{width:8px;height:8px;border-radius:50%;background:var(--border)}
+.comp-dot.filled{background:var(--accent-blue)}
+
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s}
+.btn-primary{background:var(--accent-blue);color:#fff}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.stat-card,.table-wrap,.assignee-card,.comp-card{animation:fadeUp 0.25s ease both}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="wordmark">IDC</div>
+    <div class="tag">Internal Portal</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/><path d="M11 7c2 0 4 1 4 4"/><circle cx="12" cy="3.5" r="2"/></svg>Team</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M5 3V1M11 3V1M4 9h2M7 9h2M10 9h2"/></svg>Client Budgets</a>
+      <a class="nav-item active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h5"/></svg>Assignees</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5 8l2 2 4-4"/></svg>Competencies</a>
+      <a class="nav-item" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 11l-3-3 3-3M3 5l3 3-3 3"/></svg>Partners</a>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">HL</div>
+    <div><div class="user-name">Haley L.</div><div class="user-role">Employee · Ops</div></div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <h1>Ops <em>Center</em></h1>
+    <p>Client budgets · Team capacity · Assignees · Competencies · Week of Mar 30</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('budgets',this)">Client Budgets</div>
+    <div class="tab" onclick="switchTab('capacity',this)">Capacity</div>
+    <div class="tab" onclick="switchTab('assignees',this)">Assignees</div>
+    <div class="tab" onclick="switchTab('competencies',this)">Competencies</div>
+  </div>
+
+  <!-- ====== TAB: CLIENT BUDGETS ====== -->
+  <div class="tab-content active" id="tab-budgets">
+    <div class="stat-row">
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-blue)"></div><div class="stat-label">Active clients</div><div class="stat-value">8</div><div class="stat-sub">2 onboarding</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-green)"></div><div class="stat-label">Total weekly hours</div><div class="stat-value">312</div><div class="stat-sub">Of 380 allocated</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-amber)"></div><div class="stat-label">At capacity</div><div class="stat-value">3</div><div class="stat-sub">Clients >85% used</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-coral)"></div><div class="stat-label">Over budget</div><div class="stat-value">1</div><div class="stat-sub">Acme Corp · +12h</div></div>
+    </div>
+
+    <div class="section-header">
+      <div><div class="section-title">Weekly client budget sheet</div><div class="section-sub">Hours only · Week of Mar 30, 2026</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost">↓ Export CSV</button>
+        <button class="btn btn-primary">+ Add client</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Asana project</th>
+            <th>PM</th>
+            <th>Assignees</th>
+            <th>Budget hrs</th>
+            <th>Used this wk</th>
+            <th>Usage</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="client-name">Acme Corp</div><div class="client-sub">Enterprise · Retainer</div></td>
+            <td><span style="font-size:12px;color:var(--accent-blue);cursor:pointer">ACM-2026-Q2 ↗</span></td>
+            <td><div style="font-size:12px">Haley L.</div></td>
+            <td>
+              <div class="assignee-list">
+                <div class="assignee-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>
+                <div class="assignee-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div>
+                <div class="assignee-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>
+              </div>
+            </td>
+            <td class="hours-cell">40h</td>
+            <td class="hours-cell over">52h</td>
+            <td>
+              <div class="usage-wrap">
+                <div class="usage-bar-track"><div class="usage-bar-fill" style="width:100%;background:var(--accent-coral)"></div></div>
+                <span class="usage-pct over">130%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-coral">Over budget</span></td>
+          </tr>
+          <tr>
+            <td><div class="client-name">Bright Digital</div><div class="client-sub">Growth · Monthly</div></td>
+            <td><span style="font-size:12px;color:var(--accent-blue);cursor:pointer">BDG-2026-Q2 ↗</span></td>
+            <td><div style="font-size:12px">Jordan M.</div></td>
+            <td>
+              <div class="assignee-list">
+                <div class="assignee-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>
+                <div class="assignee-av" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">SP</div>
+              </div>
+            </td>
+            <td class="hours-cell">30h</td>
+            <td class="hours-cell warn">26h</td>
+            <td>
+              <div class="usage-wrap">
+                <div class="usage-bar-track"><div class="usage-bar-fill" style="width:87%;background:var(--accent-amber)"></div></div>
+                <span class="usage-pct warn">87%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-amber">High usage</span></td>
+          </tr>
+          <tr>
+            <td><div class="client-name">Solis Health</div><div class="client-sub">Startup · Project</div></td>
+            <td><span style="font-size:12px;color:var(--accent-blue);cursor:pointer">SOL-2026-Q2 ↗</span></td>
+            <td><div style="font-size:12px">Haley L.</div></td>
+            <td>
+              <div class="assignee-list">
+                <div class="assignee-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>
+                <div class="assignee-av" style="background:linear-gradient(135deg,#7C5CBF,#2DAE7F)">TC</div>
+              </div>
+            </td>
+            <td class="hours-cell">25h</td>
+            <td class="hours-cell ok">18h</td>
+            <td>
+              <div class="usage-wrap">
+                <div class="usage-bar-track"><div class="usage-bar-fill" style="width:72%;background:var(--accent-green)"></div></div>
+                <span class="usage-pct ok">72%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-green">On track</span></td>
+          </tr>
+          <tr>
+            <td><div class="client-name">Nova Ventures</div><div class="client-sub">Enterprise · Retainer</div></td>
+            <td><span style="font-size:12px;color:var(--accent-blue);cursor:pointer">NOV-2026-Q2 ↗</span></td>
+            <td><div style="font-size:12px">Roger G.</div></td>
+            <td>
+              <div class="assignee-list">
+                <div class="assignee-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div>
+                <div class="assignee-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>
+                <div class="assignee-av" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">SP</div>
+                <div class="assignee-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>
+              </div>
+            </td>
+            <td class="hours-cell">60h</td>
+            <td class="hours-cell ok">44h</td>
+            <td>
+              <div class="usage-wrap">
+                <div class="usage-bar-track"><div class="usage-bar-fill" style="width:73%;background:var(--accent-green)"></div></div>
+                <span class="usage-pct ok">73%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-green">On track</span></td>
+          </tr>
+          <tr>
+            <td><div class="client-name">Meridian Co.</div><div class="client-sub">SMB · Monthly</div></td>
+            <td><span style="font-size:12px;color:var(--accent-blue);cursor:pointer">MER-2026-Q2 ↗</span></td>
+            <td><div style="font-size:12px">Taylor C.</div></td>
+            <td>
+              <div class="assignee-list">
+                <div class="assignee-av" style="background:linear-gradient(135deg,#7C5CBF,#2DAE7F)">TC</div>
+              </div>
+            </td>
+            <td class="hours-cell">20h</td>
+            <td class="hours-cell ok">8h</td>
+            <td>
+              <div class="usage-wrap">
+                <div class="usage-bar-track"><div class="usage-bar-fill" style="width:40%;background:var(--accent-blue)"></div></div>
+                <span class="usage-pct" style="color:var(--accent-blue)">40%</span>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Early week</span></td>
+          </tr>
+          <tr>
+            <td><div class="client-name">Orion Labs</div><div class="client-sub">Startup · Onboarding</div></td>
+            <td><span style="font-size:12px;color:var(--muted)">Pending setup</span></td>
+            <td><div style="font-size:12px;color:var(--muted)">—</div></td>
+            <td><div style="font-size:11px;color:var(--muted)">TBD</div></td>
+            <td class="hours-cell" style="color:var(--muted)">—</td>
+            <td class="hours-cell" style="color:var(--muted)">—</td>
+            <td><div style="font-size:11px;color:var(--muted)">—</div></td>
+            <td><span class="badge badge-gray">Onboarding</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ====== TAB: CAPACITY ====== -->
+  <div class="tab-content" id="tab-capacity">
+    <div class="stat-row">
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-blue)"></div><div class="stat-label">Team hours (this wk)</div><div class="stat-value">186</div><div class="stat-sub">Of 200 available</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-green)"></div><div class="stat-label">Avg weekly hours</div><div class="stat-value">37.2</div><div class="stat-sub">Across 5 members</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-amber)"></div><div class="stat-label">At capacity</div><div class="stat-value">2</div><div class="stat-sub">Members >90% utilized</div></div>
+      <div class="stat-card"><div class="accent-bar" style="background:var(--accent-purple)"></div><div class="stat-label">Available bandwidth</div><div class="stat-value">14h</div><div class="stat-sub">This week across team</div></div>
+    </div>
+
+    <div class="section-header">
+      <div><div class="section-title">Weekly hours & capacity</div><div class="section-sub">Worked vs available · All team members</div></div>
+      <div class="week-nav">
+        <button>‹</button>
+        <div class="wlabel">Week of Mar 30, 2026</div>
+        <button>›</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div style="padding:4px 0">
+
+        <!-- HALEY -->
+        <div class="capacity-row" style="padding:16px 20px">
+          <div class="cap-member">
+            <div class="cap-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>
+            <div><div class="cap-name">Haley L.</div><div class="cap-title">Senior Strategist</div></div>
+          </div>
+          <div class="cap-meta">
+            <span class="cap-tag badge badge-blue">Employee</span>
+            <span style="font-size:11px;color:var(--muted)">CST · 9am–5pm</span>
+          </div>
+          <div class="cap-hours">
+            <div class="cap-bar-wrap">
+              <div class="cap-bar-bg"><div class="cap-bar-fill" style="width:85%;background:var(--accent-amber)"></div></div>
+            </div>
+            <div class="cap-bar-label"><span>34h worked</span><span>40h available</span></div>
+          </div>
+          <div class="cap-nums">
+            <div class="cap-num-val" style="color:var(--accent-amber)">85%</div>
+            <div class="cap-num-sub">Utilization</div>
+          </div>
+        </div>
+
+        <!-- ROGER -->
+        <div class="capacity-row" style="padding:16px 20px">
+          <div class="cap-member">
+            <div class="cap-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div>
+            <div><div class="cap-name">Roger G.</div><div class="cap-title">Creative Director</div></div>
+          </div>
+          <div class="cap-meta">
+            <span class="cap-tag badge badge-blue">Employee</span>
+            <span style="font-size:11px;color:var(--muted)">CST · 9am–6pm</span>
+          </div>
+          <div class="cap-hours">
+            <div class="cap-bar-wrap">
+              <div class="cap-bar-bg"><div class="cap-bar-fill" style="width:100%;background:var(--accent-coral)"></div></div>
+            </div>
+            <div class="cap-bar-label"><span>46h worked</span><span>45h available</span></div>
+          </div>
+          <div class="cap-nums">
+            <div class="cap-num-val" style="color:var(--accent-coral)">102%</div>
+            <div class="cap-num-sub">Over capacity</div>
+          </div>
+        </div>
+
+        <!-- JORDAN -->
+        <div class="capacity-row" style="padding:16px 20px">
+          <div class="cap-member">
+            <div class="cap-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>
+            <div><div class="cap-name">Jordan M.</div><div class="cap-title">Project Manager</div></div>
+          </div>
+          <div class="cap-meta">
+            <span class="cap-tag badge badge-blue">Employee</span>
+            <span style="font-size:11px;color:var(--muted)">EST · 9am–5pm</span>
+          </div>
+          <div class="cap-hours">
+            <div class="cap-bar-wrap">
+              <div class="cap-bar-bg"><div class="cap-bar-fill" style="width:70%;background:var(--accent-green)"></div></div>
+            </div>
+            <div class="cap-bar-label"><span>28h worked</span><span>40h available</span></div>
+          </div>
+          <div class="cap-nums">
+            <div class="cap-num-val" style="color:var(--accent-green)">70%</div>
+            <div class="cap-num-sub">Utilization</div>
+          </div>
+        </div>
+
+        <!-- SAM -->
+        <div class="capacity-row" style="padding:16px 20px">
+          <div class="cap-member">
+            <div class="cap-av" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">SP</div>
+            <div><div class="cap-name">Sam P.</div><div class="cap-title">Copywriter</div></div>
+          </div>
+          <div class="cap-meta">
+            <span class="cap-tag" style="background:#F2EDFA;color:#5C3E9A;font-size:10px;padding:2px 6px;border-radius:4px">Contractor</span>
+            <span style="font-size:11px;color:var(--muted)">CST · Flexible</span>
+          </div>
+          <div class="cap-hours">
+            <div class="cap-bar-wrap">
+              <div class="cap-bar-bg"><div class="cap-bar-fill" style="width:75%;background:var(--accent-green)"></div></div>
+            </div>
+            <div class="cap-bar-label"><span>22h worked</span><span>30h available</span></div>
+          </div>
+          <div class="cap-nums">
+            <div class="cap-num-val" style="color:var(--accent-green)">73%</div>
+            <div class="cap-num-sub">Utilization</div>
+          </div>
+        </div>
+
+        <!-- TAYLOR -->
+        <div class="capacity-row" style="padding:16px 20px">
+          <div class="cap-member">
+            <div class="cap-av" style="background:linear-gradient(135deg,#7C5CBF,#2DAE7F)">TC</div>
+            <div><div class="cap-name">Taylor C.</div><div class="cap-title">Designer</div></div>
+          </div>
+          <div class="cap-meta">
+            <span class="cap-tag badge badge-blue">Employee</span>
+            <span style="font-size:11px;color:var(--muted)">CST · 8am–4pm</span>
+          </div>
+          <div class="cap-hours">
+            <div class="cap-bar-wrap">
+              <div class="cap-bar-bg"><div class="cap-bar-fill" style="width:90%;background:var(--accent-amber)"></div></div>
+            </div>
+            <div class="cap-bar-label"><span>36h worked</span><span>40h available</span></div>
+          </div>
+          <div class="cap-nums">
+            <div class="cap-num-val" style="color:var(--accent-amber)">90%</div>
+            <div class="cap-num-sub">Near capacity</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TEAM SUMMARY BAR -->
+    <div style="background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:20px 24px;display:flex;align-items:center;gap:32px">
+      <div><div style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:4px">Team utilization</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:200px;height:10px;background:var(--border);border-radius:5px;overflow:hidden">
+            <div style="width:84%;height:100%;background:linear-gradient(90deg,var(--accent-green),var(--accent-amber));border-radius:5px"></div>
+          </div>
+          <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:600">84%</div>
+        </div>
+      </div>
+      <div style="height:40px;width:1px;background:var(--border)"></div>
+      <div><div style="font-size:11px;color:var(--muted)">Employees</div><div style="font-size:16px;font-weight:600;margin-top:2px">4</div></div>
+      <div><div style="font-size:11px;color:var(--muted)">Contractors</div><div style="font-size:16px;font-weight:600;margin-top:2px">1</div></div>
+      <div><div style="font-size:11px;color:var(--muted)">Total available</div><div style="font-size:16px;font-weight:600;margin-top:2px">195h</div></div>
+      <div><div style="font-size:11px;color:var(--muted)">Total worked</div><div style="font-size:16px;font-weight:600;margin-top:2px">166h</div></div>
+      <div><div style="font-size:11px;color:var(--muted)">Remaining</div><div style="font-size:16px;font-weight:600;color:var(--accent-green);margin-top:2px">29h</div></div>
+    </div>
+  </div>
+
+  <!-- ====== TAB: ASSIGNEES ====== -->
+  <div class="tab-content" id="tab-assignees">
+    <div class="section-header">
+      <div><div class="section-title">Client assignee sheet</div><div class="section-sub">Who's working on what · Current quarter</div></div>
+      <button class="btn btn-primary">+ Assign member</button>
+    </div>
+    <div class="assignee-card">
+      <div style="flex:1"><div class="ac-client">Acme Corp</div><div class="ac-sub">Enterprise · Retainer · PM: Haley L.</div></div>
+      <div class="ac-assignees">
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>Haley L. · Strategy</div>
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div>Roger G. · Creative</div>
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>Jordan M. · Ops</div>
+      </div>
+    </div>
+    <div class="assignee-card">
+      <div style="flex:1"><div class="ac-client">Bright Digital</div><div class="ac-sub">Growth · Monthly · PM: Jordan M.</div></div>
+      <div class="ac-assignees">
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>Jordan M. · PM</div>
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">SP</div>Sam P. · Copy</div>
+      </div>
+    </div>
+    <div class="assignee-card">
+      <div style="flex:1"><div class="ac-client">Solis Health</div><div class="ac-sub">Startup · Project · PM: Haley L.</div></div>
+      <div class="ac-assignees">
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>Haley L. · Lead</div>
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#7C5CBF,#2DAE7F)">TC</div>Taylor C. · Design</div>
+      </div>
+    </div>
+    <div class="assignee-card">
+      <div style="flex:1"><div class="ac-client">Nova Ventures</div><div class="ac-sub">Enterprise · Retainer · PM: Roger G.</div></div>
+      <div class="ac-assignees">
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div>Roger G. · CD</div>
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>Haley L. · Strategy</div>
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">SP</div>Sam P. · Copy</div>
+        <div class="ac-chip"><div class="ac-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>Jordan M. · PM</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== TAB: COMPETENCIES ====== -->
+  <div class="tab-content" id="tab-competencies">
+    <div class="section-header">
+      <div><div class="section-title">Team competencies</div><div class="section-sub">Tools, skills, and proficiency levels</div></div>
+      <button class="btn btn-primary">+ Add tool</button>
+    </div>
+    <div class="comp-grid">
+      <!-- HALEY -->
+      <div class="comp-card">
+        <div class="comp-member">
+          <div class="comp-av" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>
+          <div><div class="comp-name">Haley L.</div><div class="comp-title">Senior Strategist</div></div>
+        </div>
+        <div class="comp-tool"><span class="tool-name">Asana</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-primary">Primary</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">Google Analytics</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">Webflow</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div><div class="comp-dot"></div></div></div></div>
+      </div>
+      <!-- ROGER -->
+      <div class="comp-card">
+        <div class="comp-member">
+          <div class="comp-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div>
+          <div><div class="comp-name">Roger G.</div><div class="comp-title">Creative Director</div></div>
+        </div>
+        <div class="comp-tool"><span class="tool-name">Figma</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-primary">Primary</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">Photoshop</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">After Effects</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div><div class="comp-dot"></div></div></div></div>
+      </div>
+      <!-- JORDAN -->
+      <div class="comp-card">
+        <div class="comp-member">
+          <div class="comp-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>
+          <div><div class="comp-name">Jordan M.</div><div class="comp-title">Project Manager</div></div>
+        </div>
+        <div class="comp-tool"><span class="tool-name">Asana</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-primary">Primary</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">Notion</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">Zapier</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div><div class="comp-dot"></div><div class="comp-dot"></div></div></div></div>
+      </div>
+      <!-- SAM -->
+      <div class="comp-card">
+        <div class="comp-member">
+          <div class="comp-av" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">SP</div>
+          <div><div class="comp-name">Sam P.</div><div class="comp-title">Copywriter</div></div>
+        </div>
+        <div class="comp-tool"><span class="tool-name">HubSpot</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-primary">Primary</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">Mailchimp</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div><div class="comp-dot"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">WordPress</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div></div></div></div>
+      </div>
+      <!-- TAYLOR -->
+      <div class="comp-card">
+        <div class="comp-member">
+          <div class="comp-av" style="background:linear-gradient(135deg,#7C5CBF,#2DAE7F)">TC</div>
+          <div><div class="comp-name">Taylor C.</div><div class="comp-title">Designer</div></div>
+        </div>
+        <div class="comp-tool"><span class="tool-name">Figma</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-primary">Primary</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">Canva</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div></div></div></div>
+        <div class="comp-tool"><span class="tool-name">Illustrator</span><div style="display:flex;align-items:center;gap:6px"><span class="tool-secondary">Also knows</span><div class="comp-dots"><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot filled"></div><div class="comp-dot"></div><div class="comp-dot"></div></div></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + id).classList.add('active');
+}
+</script>
+</body>
+</html>

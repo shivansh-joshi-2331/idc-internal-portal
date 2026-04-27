@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  initials      String
+  role          Role      @default(EMPLOYEE)
+  department    Department
+  jobTitle      String
+  bio           String?
+  avatarGradient String   // e.g. "135deg,#3B6FE8,#7C5CBF"
+  skills        String[]
+  socialLinks   Json?     // { linkedin, behance, twitter }
+  funFact       String?
+  joinedAt      DateTime
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  
+  // Relations
+  scheduleEntries   ScheduleEntry[]
+  timeEntries       TimeEntry[]
+  leaderboardPoints LeaderboardPoint[]
+  challengeEntries  ChallengeEntry[]
+  announcements     Announcement[]     @relation("author")
+  leaveRequests     LeaveRequest[]
+}
+
+enum Role {
+  EMPLOYEE
+  ADMIN
+}
+
+enum Department {
+  DESIGN
+  STRATEGY
+  VIDEO
+  OPS
+}
+
+// ─── SCHEDULE ───────────────────────────────────────────
+
+model ScheduleEntry {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  date      DateTime     @db.Date
+  type      ShiftType
+  startTime String?      // "09:00"
+  endTime   String?      // "17:00"
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  
+  @@unique([userId, date])
+}
+
+enum ShiftType {
+  IN_OFFICE
+  REMOTE
+  DAY_OFF
+  HOLIDAY
+  GAMES_DAY
+  LEAVE
+}
+
+model Holiday {
+  id    String   @id @default(cuid())
+  name  String
+  date  DateTime @db.Date
+  isPaid Boolean @default(true)
+}
+
+model LeaveRequest {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  startDate DateTime    @db.Date
+  endDate   DateTime    @db.Date
+  reason    String?
+  status    LeaveStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ─── TIME TRACKING ──────────────────────────────────────
+
+model TimeEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @db.Date
+  taskName  String
+  startTime DateTime
+  endTime   DateTime?
+  duration  Int?     // minutes
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+// ─── LEADERBOARD & CHALLENGES ───────────────────────────
+
+model LeaderboardPoint {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  points    Int
+  reason    String   // "Weekly challenge", "Friday game win", "Manual"
+  sourceId  String?  // FK to challenge/game
+  awardedBy String?  // admin userId for manual entries
+  createdAt DateTime @default(now())
+}
+
+model WeeklyChallenge {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  points      Int
+  weekStart   DateTime         @db.Date
+  weekEnd     DateTime         @db.Date
+  isActive    Boolean          @default(true)
+  createdBy   String           // admin userId
+  createdAt   DateTime         @default(now())
+  entries     ChallengeEntry[]
+}
+
+model ChallengeEntry {
+  id          String          @id @default(cuid())
+  challengeId String
+  challenge   WeeklyChallenge @relation(fields: [challengeId], references: [id])
+  userId      String
+  user        User            @relation(fields: [userId], references: [id])
+  completed   Boolean         @default(false)
+  completedAt DateTime?
+  verifiedBy  String?         // admin userId (for manual verification)
+  createdAt   DateTime        @default(now())
+  
+  @@unique([challengeId, userId])
+}
+
+model Achievement {
+  id          String  @id @default(cuid())
+  name        String
+  description String
+  icon        String  // emoji
+  points      Int
+  criteria    Json    // { type: "streak", count: 3 } etc.
+}
+
+// ─── ANNOUNCEMENTS ──────────────────────────────────────
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  priority  Priority @default(NORMAL)
+  authorId  String
+  author    User     @relation("author", fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+// ─── HANDBOOK ───────────────────────────────────────────
+
+model HandbookSection {
+  id        String    @id @default(cuid())
+  title     String
+  slug      String    @unique
+  category  String    // "Getting started", "Working here", etc.
+  icon      String?
+  content   String    @db.Text  // Markdown or rich text
+  sortOrder Int
+  updatedAt DateTime  @updatedAt
+  updatedBy String?   // admin userId
+  createdAt DateTime  @default(now())
+}
+
+// ─── ADMIN NOTIFICATIONS ────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?  // If null, it's a global admin broadcast, or we can tie explicitly to an admin
+  title     String
+  body      String
+  type      String   // "CLOCK_IN", "CLOCK_OUT", "LEAVE_REQUEST"
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

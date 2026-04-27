@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — PM Touchbases</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+
+/* ── SIDEBAR ── */
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto;letter-spacing:0.06em}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3B6FE8,#7C5CBF);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+
+/* ── MAIN ── */
+.main{margin-left:220px;flex:1;padding:32px;max-width:1200px}
+.page-header{margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--accent-purple)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+
+/* ── MONTH BANNER ── */
+.month-banner{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 22px;margin-bottom:22px}
+.month-label{font-family:'Fraunces',serif;font-size:22px;font-weight:300;letter-spacing:-0.5px}
+.month-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.progress-wrap{flex:1;max-width:320px;margin:0 24px}
+.progress-label{font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between}
+.progress-bar{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;background:var(--accent-green);transition:width 0.4s ease}
+.reset-chip{font-size:11px;display:flex;align-items:center;gap:6px;background:#E8F7F2;color:#1A7A57;border:1px solid #A8DEC8;border-radius:20px;padding:5px 12px;font-weight:500}
+
+/* ── STAT STRIP ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:18px 20px;border:1px solid var(--border);position:relative;overflow:hidden}
+.stat-card .accent-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:6px}
+.stat-value{font-family:'Fraunces',serif;font-size:28px;font-weight:600;letter-spacing:-1px;line-height:1}
+.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.filter-tab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s}
+.filter-tab.active{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue)}
+.filter-tab.f-done.active{background:var(--accent-green);border-color:var(--accent-green)}
+.filter-tab.f-overdue.active{background:var(--accent-coral);border-color:var(--accent-coral)}
+.filter-tab.f-upcoming.active{background:var(--accent-amber);border-color:var(--accent-amber)}
+
+/* ── GRID TABLE ── */
+.grid-wrap{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;margin-bottom:24px}
+.grid-table{width:100%;border-collapse:collapse}
+
+/* Header row */
+.grid-table thead th{
+  padding:12px 16px;text-align:left;font-size:11px;text-transform:uppercase;
+  letter-spacing:0.07em;color:var(--muted);font-weight:500;
+  border-bottom:1px solid var(--border);background:var(--bg);
+  white-space:nowrap
+}
+.grid-table thead th.pm-col{
+  min-width:160px;position:sticky;left:0;z-index:2;background:var(--bg)
+}
+.grid-table thead th.person-col{
+  text-align:center;min-width:110px
+}
+
+/* Body */
+.grid-table tbody tr{border-bottom:1px solid var(--border)}
+.grid-table tbody tr:last-child{border-bottom:none}
+.grid-table tbody tr:hover td{background:#FAFAF8}
+.grid-table tbody tr:hover td.pm-cell{background:#FAFAF8}
+
+.pm-cell{
+  padding:14px 16px;font-weight:600;font-size:14px;
+  position:sticky;left:0;background:var(--surface);
+  border-right:1px solid var(--border);z-index:1;
+  white-space:nowrap
+}
+.pm-cell-inner{display:flex;align-items:center;gap:10px}
+.pm-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;flex-shrink:0}
+.pm-name{font-size:13px;font-weight:600}
+.pm-role{font-size:10px;color:var(--muted);font-weight:400}
+.pm-progress{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* Cell */
+.tb-cell{padding:10px 8px;text-align:center;vertical-align:middle;cursor:pointer;transition:background 0.1s}
+.tb-cell:hover{background:rgba(59,111,232,0.04) !important}
+
+/* Touchbase button states */
+.tb-btn{
+  width:80px;margin:0 auto;
+  border-radius:20px;padding:5px 0;
+  font-size:11px;font-weight:500;
+  border:1px solid;cursor:pointer;
+  transition:all 0.15s;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:4px
+}
+.tb-btn.done{background:#E8F7F2;color:#1A7A57;border-color:#A8DEC8}
+.tb-btn.done:hover{background:#D0EEE5}
+.tb-btn.overdue{background:#FDEDEB;color:#B03020;border-color:#F5BDB5}
+.tb-btn.overdue:hover{background:#F9DCD9}
+.tb-btn.upcoming{background:#FEF3DC;color:#A06500;border-color:#F0D490}
+.tb-btn.upcoming:hover{background:#FAEBC0}
+.tb-btn.pending{background:var(--bg);color:var(--muted);border-color:var(--border)}
+.tb-btn.pending:hover{border-color:var(--accent-blue);color:var(--accent-blue);background:#EBF0FD}
+
+/* Person header chip */
+.person-chip{display:flex;flex-direction:column;align-items:center;gap:3px}
+.person-av-sm{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;margin:0 auto}
+.person-name-sm{font-size:10px;color:var(--text);font-weight:500;white-space:nowrap}
+.person-type{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em}
+
+/* ── LEGEND ── */
+.legend{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+
+/* ── DRAWER ── */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.4);backdrop-filter:blur(3px);z-index:200}
+.drawer-overlay.open{display:block}
+.drawer{position:fixed;top:0;right:-480px;width:460px;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:201;padding:0;overflow-y:auto;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:-4px 0 24px rgba(0,0,0,0.08)}
+.drawer.open{right:0}
+.drawer-hero{padding:28px 28px 22px;border-bottom:1px solid var(--border)}
+.drawer-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);margin-bottom:20px;transition:all 0.15s}
+.drawer-close:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.drawer-pairing{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.drawer-av-lg{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;flex-shrink:0}
+.arrow-icon{color:var(--muted);font-size:18px}
+.drawer-title{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:2px}
+.drawer-sub{font-size:12px;color:var(--muted)}
+.drawer-body{padding:24px 28px}
+.sec-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:10px;margin-top:22px}
+.sec-label:first-child{margin-top:0}
+
+/* Status selector */
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.status-opt{padding:10px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);text-align:center;cursor:pointer;transition:all 0.15s;font-family:inherit;font-size:12px;font-weight:500;background:transparent}
+.status-opt:hover{border-color:#C8C0B0}
+.status-opt.sel-done{background:#E8F7F2;color:#1A7A57;border-color:#A8DEC8}
+.status-opt.sel-upcoming{background:#FEF3DC;color:#A06500;border-color:#F0D490}
+.status-opt.sel-overdue{background:#FDEDEB;color:#B03020;border-color:#F5BDB5}
+
+/* Date input */
+.date-row{display:flex;gap:12px}
+.date-field{flex:1}
+.date-field label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px}
+.date-input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--surface);outline:none;color:var(--text)}
+.date-input:focus{border-color:var(--accent-blue)}
+
+/* Notes */
+.notes-ta{width:100%;height:100px;padding:11px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;resize:vertical;outline:none;color:var(--text);background:var(--surface);line-height:1.6}
+.notes-ta:focus{border-color:var(--accent-blue)}
+
+/* History */
+.hist-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.hist-item:last-child{border-bottom:none}
+.hist-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-green);margin-top:5px;flex-shrink:0}
+.hist-text{font-size:13px;line-height:1.5}
+.hist-date{font-size:11px;color:var(--muted);margin-top:2px}
+.hist-note{font-size:12px;color:var(--muted);margin-top:3px;font-style:italic}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s}
+.btn-primary{background:var(--accent-green);color:#fff}
+.btn-primary:hover{background:#22946C}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.btn-row{display:flex;gap:10px;margin-top:24px}
+
+/* Toast */
+#toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:600;display:flex;align-items:center;gap:10px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.grid-wrap,.stats-row,.month-banner{animation:fadeUp 0.3s ease both}
+.stats-row{animation-delay:.05s}
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="03-team.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/><path d="M11 7c2 0 4 1 4 4"/><circle cx="12" cy="3.5" r="2"/></svg>Team</a>
+      <a class="nav-item" href="04-leaderboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+      <a class="nav-item" href="05-handbook.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h4M5 8h4M5 11h2"/></svg>Handbook</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>Client Budgets</a>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+      <a class="nav-item active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2v4l3 3"/><circle cx="8" cy="8" r="6"/></svg>PM Touchbases</a>
+      <a class="nav-item" href="06-partners.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l4-4 4 4 4-4"/></svg>Partners</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only" href="admin/01-invoices.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/02-sales-pipeline.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/03-analytics.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="07-hiring.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="sidebar-user"><div class="user-avatar">JL</div><div><div class="user-name">Jamie L.</div><div class="user-role">Designer</div></div></div>
+</aside>
+
+<!-- ── MAIN ── -->
+<main class="main">
+  <div class="page-header">
+    <div>
+      <h1>PM <em>Touchbases</em></h1>
+      <p>Monthly check-ins between PMs and contractors/designers · Resets on the 1st</p>
+    </div>
+    <button class="btn btn-ghost" onclick="showToast('Exported to CSV','📄')">↓ Export</button>
+  </div>
+
+  <!-- MONTH BANNER -->
+  <div class="month-banner">
+    <div>
+      <div class="month-label" id="month-label">April 2026</div>
+      <div class="month-meta" id="month-meta">Resets in 30 days · <span id="days-left"></span> days remaining</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Overall completion</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+    <div class="reset-chip">✓ Auto-resets Apr 1</div>
+  </div>
+
+  <!-- STAT STRIP -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="accent-bar" style="background:var(--accent-green)"></div><div class="stat-label">Done</div><div class="stat-value" id="s-done" style="color:var(--accent-green)">0</div><div class="stat-sub">touchbases complete</div></div>
+    <div class="stat-card"><div class="accent-bar" style="background:var(--accent-coral)"></div><div class="stat-label">Overdue</div><div class="stat-value" id="s-overdue" style="color:var(--accent-coral)">0</div><div class="stat-sub">need scheduling now</div></div>
+    <div class="stat-card"><div class="accent-bar" style="background:var(--accent-amber)"></div><div class="stat-label">Upcoming</div><div class="stat-value" id="s-upcoming" style="color:var(--accent-amber)">0</div><div class="stat-sub">scheduled this month</div></div>
+    <div class="stat-card"><div class="accent-bar" style="background:var(--muted)"></div><div class="stat-label">Pending</div><div class="stat-value" id="s-pending" style="color:var(--muted)">0</div><div class="stat-sub">not yet scheduled</div></div>
+  </div>
+
+  <!-- FILTER + LEGEND -->
+  <div class="filter-bar">
+    <div class="filter-tab active" onclick="filterGrid('all',this)">All pairings</div>
+    <div class="filter-tab f-done" onclick="filterGrid('done',this)">Done</div>
+    <div class="filter-tab f-overdue" onclick="filterGrid('overdue',this)">Overdue</div>
+    <div class="filter-tab f-upcoming" onclick="filterGrid('upcoming',this)">Upcoming</div>
+    <div class="filter-tab" onclick="filterGrid('pending',this)">Pending</div>
+  </div>
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:var(--accent-green)"></div>Done — touchbase completed this month</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--accent-coral)"></div>Overdue — past the 20th, not done</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--accent-amber)"></div>Upcoming — date scheduled</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--border)"></div>Pending — not yet booked</div>
+  </div>
+
+  <!-- GRID TABLE -->
+  <div class="grid-wrap" style="overflow-x:auto">
+    <table class="grid-table" id="grid">
+      <thead id="grid-head"></thead>
+      <tbody id="grid-body"></tbody>
+    </table>
+  </div>
+
+</main>
+
+<!-- ── DRAWER ── -->
+<div class="drawer-overlay" id="dov" onclick="closeDrawer()"></div>
+<div class="drawer" id="drw">
+  <div style="padding:28px 28px 0">
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-hero">
+    <div class="drawer-pairing">
+      <div class="drawer-av-lg" id="d-pm-av" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">HL</div>
+      <div class="arrow-icon">→</div>
+      <div class="drawer-av-lg" id="d-person-av" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div>
+    </div>
+    <div class="drawer-title" id="d-title">Haley → Roger Grant</div>
+    <div class="drawer-sub" id="d-sub">Monthly touchbase · April 2026</div>
+  </div>
+  <div class="drawer-body">
+
+    <div class="sec-label">Status</div>
+    <div class="status-grid">
+      <button class="status-opt" id="opt-done"    onclick="setStatus('done')">✓ Done</button>
+      <button class="status-opt" id="opt-upcoming" onclick="setStatus('upcoming')">📅 Upcoming</button>
+      <button class="status-opt" id="opt-pending"  onclick="setStatus('pending')">○ Pending</button>
+    </div>
+
+    <div class="sec-label">Dates</div>
+    <div class="date-row">
+      <div class="date-field">
+        <label>Touchbase date</label>
+        <input class="date-input" type="date" id="d-date"/>
+      </div>
+      <div class="date-field">
+        <label>Next touchbase</label>
+        <input class="date-input" type="date" id="d-next"/>
+      </div>
+    </div>
+
+    <div class="sec-label">Notes from this session</div>
+    <textarea class="notes-ta" id="d-notes" placeholder="What was discussed? Any action items, concerns, or follow-ups…"></textarea>
+
+    <div class="sec-label">History</div>
+    <div id="d-history">
+      <div class="hist-item"><div class="hist-dot"></div><div><div class="hist-text">Touchbase completed</div><div class="hist-date">Mar 14, 2026</div><div class="hist-note">Discussed Q2 availability and upcoming campaign workload. Roger flagged need for clearer briefs.</div></div></div>
+      <div class="hist-item"><div class="hist-dot"></div><div><div class="hist-text">Touchbase completed</div><div class="hist-date">Feb 11, 2026</div><div class="hist-note">Checked in on Acme Corp retainer. All good. Agreed to monthly cadence going forward.</div></div></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" style="flex:1" onclick="saveDrawer()">Save changes</button>
+      <button class="btn btn-ghost" onclick="closeDrawer()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────────────────────────────────────
+
+const PMS = [
+  { id:'hl', name:'Haley Lin',   initials:'HL', role:'Strategy Lead',  grad:'linear-gradient(135deg,#2DAE7F,#3B6FE8)' },
+  { id:'jm', name:'Jordan Mills',initials:'JM', role:'Ops Manager',    grad:'linear-gradient(135deg,#2DAE7F,#F0A500)' },
+  { id:'dc', name:'Dana Cruz',   initials:'DC', role:'Account Manager', grad:'linear-gradient(135deg,#F0A500,#7C5CBF)' },
+]
+
+const PEOPLE = [
+  { id:'rg', name:'Roger Grant',  initials:'RG', type:'Designer',   grad:'linear-gradient(135deg,#F0A500,#E85D4A)' },
+  { id:'jl', name:'Jamie Lee',    initials:'JL', type:'Designer',   grad:'linear-gradient(135deg,#3B6FE8,#7C5CBF)' },
+  { id:'sr', name:'Sofia Reyes',  initials:'SR', type:'Designer',   grad:'linear-gradient(135deg,#7C5CBF,#E85D4A)' },
+  { id:'mw', name:'Marcus Webb',  initials:'MW', type:'Designer',   grad:'linear-gradient(135deg,#3B6FE8,#2DAE7F)' },
+  { id:'pn', name:'Priya Nair',   initials:'PN', type:'Contractor', grad:'linear-gradient(135deg,#E85D4A,#7C5CBF)' },
+  { id:'tb', name:'Tom B.',       initials:'TB', type:'Contractor', grad:'linear-gradient(135deg,#7C5CBF,#3B6FE8)' },
+  { id:'sa', name:'Sasha K.',     initials:'SK', type:'Contractor', grad:'linear-gradient(135deg,#F0A500,#2DAE7F)' },
+]
+
+// State: keyed by "pmId_personId"
+// status: 'done' | 'overdue' | 'upcoming' | 'pending'
+const now = new Date()
+const MONTH_KEY = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`
+const STORAGE_KEY = `idc_touchbases_${MONTH_KEY}`
+
+function defaultState() {
+  const state = {}
+  PMS.forEach(pm => {
+    PEOPLE.forEach(p => {
+      const key = `${pm.id}_${p.id}`
+      // Seed some demo data
+      const seeds = {
+        'hl_rg':'done','hl_jl':'done','hl_sr':'upcoming','hl_mw':'pending',
+        'hl_pn':'overdue','hl_tb':'pending','hl_sa':'pending',
+        'jm_rg':'upcoming','jm_jl':'pending','jm_sr':'done','jm_mw':'overdue',
+        'jm_pn':'pending','jm_tb':'upcoming','jm_sa':'done',
+        'dc_rg':'pending','dc_jl':'upcoming','dc_sr':'pending','dc_mw':'done',
+        'dc_pn':'done','dc_tb':'pending','dc_sa':'overdue',
+      }
+      state[key] = {
+        status: seeds[key] || 'pending',
+        date:   seeds[key] === 'done' ? '2026-04-08' : seeds[key] === 'upcoming' ? '2026-04-22' : '',
+        next:   '',
+        notes:  '',
+      }
+    })
+  })
+  return state
+}
+
+let STATE = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || defaultState()
+
+// Check if we need to reset (new month)
+function checkMonthReset() {
+  const lastKey = localStorage.getItem('idc_touchbase_last_month')
+  if (lastKey && lastKey !== MONTH_KEY) {
+    // New month — reset all statuses to pending
+    STATE = defaultState()
+    Object.keys(STATE).forEach(k => { STATE[k].status = 'pending'; STATE[k].date = ''; STATE[k].next = ''; })
+  }
+  localStorage.setItem('idc_touchbase_last_month', MONTH_KEY)
+  saveState()
+}
+checkMonthReset()
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE))
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function renderHeader() {
+  const thead = document.getElementById('grid-head')
+  const tr = document.createElement('tr')
+
+  // PM column header
+  const pmTh = document.createElement('th')
+  pmTh.className = 'pm-col'
+  pmTh.textContent = 'PM'
+  tr.appendChild(pmTh)
+
+  PEOPLE.forEach(p => {
+    const th = document.createElement('th')
+    th.className = 'person-col'
+    th.innerHTML = `
+      <div class="person-chip">
+        <div class="person-av-sm" style="background:${p.grad}">${p.initials}</div>
+        <div class="person-name-sm">${p.name.split(' ')[0]}</div>
+        <div class="person-type">${p.type}</div>
+      </div>
+    `
+    tr.appendChild(th)
+  })
+
+  thead.innerHTML = ''
+  thead.appendChild(tr)
+}
+
+function renderBody(filter='all') {
+  const tbody = document.getElementById('grid-body')
+  tbody.innerHTML = ''
+
+  PMS.forEach(pm => {
+    const tr = document.createElement('tr')
+    tr.dataset.pm = pm.id
+
+    // PM cell
+    const pmTd = document.createElement('td')
+    pmTd.className = 'pm-cell'
+    const done    = PEOPLE.filter(p => STATE[`${pm.id}_${p.id}`]?.status === 'done').length
+    const total   = PEOPLE.length
+    pmTd.innerHTML = `
+      <div class="pm-cell-inner">
+        <div class="pm-av" style="background:${pm.grad}">${pm.initials}</div>
+        <div>
+          <div class="pm-name">${pm.name}</div>
+          <div class="pm-role">${pm.role}</div>
+          <div class="pm-progress">${done}/${total} done</div>
+        </div>
+      </div>
+    `
+    tr.appendChild(pmTd)
+
+    PEOPLE.forEach(p => {
+      const key    = `${pm.id}_${p.id}`
+      const entry  = STATE[key]
+      const status = entry?.status || 'pending'
+
+      const td = document.createElement('td')
+      td.className = 'tb-cell'
+      td.dataset.key = key
+
+      // Filter logic
+      if (filter !== 'all' && status !== filter) {
+        td.style.opacity = '0.2'
+        td.style.pointerEvents = 'none'
+      }
+
+      const labels = { done:'✓ Done', overdue:'Overdue', upcoming:'Upcoming', pending:'Schedule' }
+      const btn = document.createElement('button')
+      btn.className = `tb-btn ${status}`
+      btn.textContent = labels[status]
+      btn.onclick = (e) => { e.stopPropagation(); openDrawer(pm, p) }
+
+      td.appendChild(btn)
+      tr.appendChild(td)
+    })
+
+    tbody.appendChild(tr)
+  })
+}
+
+function renderStats() {
+  let done=0, overdue=0, upcoming=0, pending=0, total=0
+  PMS.forEach(pm => PEOPLE.forEach(p => {
+    total++
+    const s = STATE[`${pm.id}_${p.id}`]?.status || 'pending'
+    if (s==='done') done++
+    else if (s==='overdue') overdue++
+    else if (s==='upcoming') upcoming++
+    else pending++
+  }))
+  document.getElementById('s-done').textContent    = done
+  document.getElementById('s-overdue').textContent  = overdue
+  document.getElementById('s-upcoming').textContent = upcoming
+  document.getElementById('s-pending').textContent  = pending
+  const pct = Math.round(done/total*100)
+  document.getElementById('progress-pct').textContent  = pct+'%'
+  document.getElementById('progress-fill').style.width = pct+'%'
+}
+
+function renderMonthBanner() {
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
+  const y = now.getFullYear(), m = now.getMonth()
+  document.getElementById('month-label').textContent = `${monthNames[m]} ${y}`
+  const lastDay = new Date(y, m+1, 0).getDate()
+  const daysLeft = lastDay - now.getDate()
+  document.getElementById('days-left').textContent = daysLeft
+  // Next reset
+  const nextMonth = new Date(y, m+1, 1)
+  const nextName  = monthNames[nextMonth.getMonth()]
+  document.querySelector('.reset-chip').textContent = `✓ Auto-resets ${nextName} 1`
+}
+
+function render(filter='all') {
+  renderMonthBanner()
+  renderHeader()
+  renderBody(filter)
+  renderStats()
+}
+
+render()
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FILTER
+// ─────────────────────────────────────────────────────────────────────────────
+
+let currentFilter = 'all'
+function filterGrid(f, el) {
+  currentFilter = f
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+  render(f)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DRAWER
+// ─────────────────────────────────────────────────────────────────────────────
+
+let drawerKey = null
+
+function openDrawer(pm, person) {
+  drawerKey = `${pm.id}_${person.id}`
+  const entry = STATE[drawerKey] || {}
+
+  document.getElementById('d-pm-av').textContent     = pm.initials
+  document.getElementById('d-pm-av').style.background = pm.grad
+  document.getElementById('d-person-av').textContent     = person.initials
+  document.getElementById('d-person-av').style.background = person.grad
+  document.getElementById('d-title').textContent = `${pm.name.split(' ')[0]} → ${person.name}`
+  document.getElementById('d-sub').textContent   = `Monthly touchbase · ${document.getElementById('month-label').textContent}`
+
+  // Status buttons
+  document.querySelectorAll('.status-opt').forEach(b => b.className = 'status-opt')
+  const s = entry.status || 'pending'
+  if (s === 'done')     document.getElementById('opt-done').classList.add('sel-done')
+  if (s === 'upcoming') document.getElementById('opt-upcoming').classList.add('sel-upcoming')
+  if (s === 'pending' || s === 'overdue') document.getElementById('opt-pending').classList.add('sel-overdue')
+
+  document.getElementById('d-date').value  = entry.date  || ''
+  document.getElementById('d-next').value  = entry.next  || ''
+  document.getElementById('d-notes').value = entry.notes || ''
+
+  document.getElementById('drw').classList.add('open')
+  document.getElementById('dov').classList.add('open')
+}
+
+function closeDrawer() {
+  document.getElementById('drw').classList.remove('open')
+  document.getElementById('dov').classList.remove('open')
+  drawerKey = null
+}
+
+let drawerStatus = null
+function setStatus(s) {
+  drawerStatus = s
+  document.querySelectorAll('.status-opt').forEach(b => b.className = 'status-opt')
+  if (s === 'done')     document.getElementById('opt-done').classList.add('sel-done')
+  if (s === 'upcoming') document.getElementById('opt-upcoming').classList.add('sel-upcoming')
+  if (s === 'pending')  document.getElementById('opt-pending').classList.add('sel-overdue')
+}
+
+function saveDrawer() {
+  if (!drawerKey) return
+  const status = drawerStatus || STATE[drawerKey]?.status || 'pending'
+  STATE[drawerKey] = {
+    status,
+    date:  document.getElementById('d-date').value,
+    next:  document.getElementById('d-next').value,
+    notes: document.getElementById('d-notes').value,
+  }
+  saveState()
+  drawerStatus = null
+  closeDrawer()
+  render(currentFilter)
+  showToast('Touchbase saved','✓')
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────────────────────────
+
+function showToast(msg, icon='✓') {
+  const t = document.getElementById('toast')
+  t.innerHTML = `<span style="font-size:16px">${icon}</span>${msg}`
+  t.style.transform = 'translateY(0)'; t.style.opacity = '1'
+  setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0' }, 3000)
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;
+  --surface:#FFFFFF;
+  --sidebar:#1A1A2E;
+  --sidebar-text:#A8A8C0;
+  --sidebar-active:#FFFFFF;
+  --text:#1C1C2E;
+  --muted:#7A7A8C;
+  --border:#E8E4DC;
+  --accent-blue:#3B6FE8;
+  --accent-green:#2DAE7F;
+  --accent-amber:#F0A500;
+  --accent-coral:#E85D4A;
+  --accent-purple:#7C5CBF;
+  --radius:14px;
+  --radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px}
+.nav-section{margin-bottom:24px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;font-weight:400;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:var(--sidebar-active);font-weight:500}
+.nav-item .icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3B6FE8,#7C5CBF);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+
+/* MAIN */
+.main{margin-left:220px;flex:1;padding:32px;max-width:1200px}
+.page-header{margin-bottom:28px}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px;color:var(--text)}
+.page-header h1 em{font-style:italic;color:var(--accent-blue)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+
+/* TOP STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:20px;border:1px solid var(--border);position:relative;overflow:hidden}
+.stat-card .accent-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius) var(--radius) 0 0}
+.stat-card .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:8px}
+.stat-card .stat-value{font-family:'Fraunces',serif;font-size:28px;font-weight:600;letter-spacing:-1px;color:var(--text);line-height:1}
+.stat-card .stat-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+/* MAIN GRID */
+.grid-main{display:grid;grid-template-columns:1fr 1fr 340px;gap:16px;margin-bottom:16px}
+.grid-bottom{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.card-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.card-action{font-size:11px;color:var(--accent-blue);cursor:pointer;font-weight:500}
+.card-body{padding:16px 20px}
+
+/* SCHEDULE */
+.schedule-week{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.day-col{display:flex;flex-direction:column;gap:4px}
+.day-label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);text-align:center;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.day-num{font-size:18px;font-family:'Fraunces',serif;font-weight:300;text-align:center;margin:6px 0 4px}
+.day-num.today{color:var(--accent-blue);font-weight:600}
+.shift-block{border-radius:6px;padding:6px 8px;font-size:11px;line-height:1.3}
+.shift-block.off{background:#F5F3EE;color:var(--muted);font-style:italic}
+.shift-block.on{background:#EBF0FD;color:#2850C0;border-left:2px solid var(--accent-blue)}
+.shift-block.remote{background:#E8F7F2;color:#1A7A57;border-left:2px solid var(--accent-green)}
+
+/* SCHEDULE FULL MONTH */
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.month-day{border-radius:6px;padding:6px 4px;min-height:52px;border:1px solid transparent;font-size:11px;cursor:default}
+.month-day .mday-num{font-size:11px;font-weight:500;color:var(--muted);margin-bottom:3px}
+.month-day.today{border-color:var(--accent-blue);background:#EBF0FD}
+.month-day.today .mday-num{color:var(--accent-blue);font-weight:700}
+.month-day.has-shift{background:#F0F4FE}
+.month-day.off-day{background:#fafaf8}
+.month-day .pill{border-radius:3px;padding:2px 4px;font-size:9px;font-weight:500;margin-top:2px;display:inline-block}
+.pill-in{background:#DDEAFB;color:#2050B0}
+.pill-out{background:#E8F7F2;color:#1A7A57}
+
+/* ANNOUNCEMENTS */
+.announcement{padding:12px 0;border-bottom:1px solid var(--border);display:flex;gap:12px}
+.announcement:last-child{border-bottom:none;padding-bottom:0}
+.ann-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.ann-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
+.ann-body{font-size:12px;color:var(--muted);line-height:1.5}
+.ann-date{font-size:10px;color:var(--muted);margin-top:4px}
+
+/* LEADERBOARD */
+.lb-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.lb-row:last-child{border-bottom:none}
+.lb-rank{font-family:'Fraunces',serif;font-size:18px;font-weight:600;width:24px;color:var(--muted);flex-shrink:0}
+.lb-rank.gold{color:#F0A500}
+.lb-rank.silver{color:#8C8C9C}
+.lb-rank.bronze{color:#B8764A}
+.lb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.lb-name{flex:1;font-size:13px;font-weight:500}
+.lb-pts{font-size:12px;font-weight:600;color:var(--text)}
+.lb-bar-wrap{width:80px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.lb-bar{height:100%;border-radius:2px}
+
+/* CHALLENGE */
+.challenge-card{background:linear-gradient(135deg,#1A1A2E 0%,#2D2D4E 100%);border-radius:var(--radius);padding:22px;color:#fff;border:none;margin-bottom:16px}
+.challenge-card .ch-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px}
+.challenge-card .ch-name{font-family:'Fraunces',serif;font-size:20px;font-weight:300;font-style:italic;margin-bottom:10px}
+.challenge-card .ch-desc{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:16px}
+.ch-progress{background:rgba(255,255,255,0.15);border-radius:4px;height:6px;margin-bottom:8px}
+.ch-progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#3B6FE8,#7C5CBF)}
+.ch-progress-label{font-size:11px;color:rgba(255,255,255,0.5)}
+
+/* HOLIDAYS */
+.holiday-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.holiday-row:last-child{border-bottom:none}
+.hol-date{width:44px;text-align:center;background:var(--bg);border-radius:8px;padding:6px 4px;flex-shrink:0}
+.hol-month{font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)}
+.hol-day{font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--text);line-height:1}
+.hol-name{flex:1;font-size:13px;font-weight:500}
+.hol-tag{font-size:10px;background:#EBF0FD;color:var(--accent-blue);border-radius:4px;padding:3px 7px;font-weight:500}
+
+/* SOCIAL */
+.social-row{display:flex;gap:10px;margin-bottom:12px}
+.social-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text);transition:all 0.15s}
+.social-btn:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.social-post{border-radius:var(--radius-sm);padding:12px;background:var(--bg);margin-bottom:8px;border:1px solid var(--border)}
+.post-platform{font-size:10px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:4px}
+.post-text{font-size:12px;color:var(--text);line-height:1.5}
+.post-meta{font-size:10px;color:var(--muted);margin-top:6px}
+
+/* ACCENT COLORS */
+.bg-blue{background:var(--accent-blue)}
+.bg-green{background:var(--accent-green)}
+.bg-amber{background:var(--accent-amber)}
+.bg-coral{background:var(--accent-coral)}
+.bg-purple{background:var(--accent-purple)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500}
+.badge-blue{background:#EBF0FD;color:#2850C0}
+.badge-green{background:#E8F7F2;color:#1A7A57}
+.badge-amber{background:#FEF3DC;color:#A06500}
+.badge-coral{background:#FDEDEB;color:#B03020}
+
+/* SUBMIT BTN */
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:8px 16px;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s}
+.btn-primary{background:var(--accent-blue);color:#fff}
+.btn-primary:hover{background:#2A5ED4}
+.btn-ghost{background:transparent;color:var(--accent-blue);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card,.stats-row .stat-card,.challenge-card{animation:fadeUp 0.3s ease both}
+.stats-row .stat-card:nth-child(1){animation-delay:0.05s}
+.stats-row .stat-card:nth-child(2){animation-delay:0.1s}
+.stats-row .stat-card:nth-child(3){animation-delay:0.15s}
+.stats-row .stat-card:nth-child(4){animation-delay:0.2s}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="wordmark">IDC</div>
+    <div class="tag">Internal Portal</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item active" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" href="02-schedule.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>
+        Schedule
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/><path d="M11 7c2 0 4 1 4 4"/><circle cx="12" cy="3.5" r="2"/></svg>
+        Team
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>
+        Leaderboard
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v9M8 10l3-3M8 10l-3-3"/><path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/></svg>
+        Handbook
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Company</div>
+      <a class="nav-item" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>
+        Announcements
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M8 4v4l3 2"/></svg>
+        Holidays
+      </a>
+      <a class="nav-item" href="#">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M5 8s1 2 3 2 3-2 3-2"/><circle cx="6" cy="6.5" r=".75" fill="currentColor"/><circle cx="10" cy="6.5" r=".75" fill="currentColor"/></svg>
+        Social
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="03-ops-capacity.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/><path d="M5 3V1M11 3V1M4 9h2M7 9h2M10 9h2"/></svg>
+        Client Budgets
+      </a>
+      <a class="nav-item" href="03-ops-capacity.html">
+        <svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+        Capacity
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">HL</div>
+    <div>
+      <div class="user-name">Haley L.</div>
+      <div class="user-role">Employee</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <div class="page-header">
+    <h1>Good morning, <em>Haley</em> ☀️</h1>
+    <p>Monday, March 30, 2026 · Week 13</p>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="accent-bar bg-blue"></div>
+      <div class="stat-label">Hours this week</div>
+      <div class="stat-value">24<span style="font-size:16px;color:var(--muted)">/40</span></div>
+      <div class="stat-sub">On track · 16 remaining</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent-bar bg-green"></div>
+      <div class="stat-label">Next shift</div>
+      <div class="stat-value" style="font-size:20px;padding-top:4px">Tue 9am</div>
+      <div class="stat-sub">In-office · CST</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent-bar bg-amber"></div>
+      <div class="stat-label">Leaderboard rank</div>
+      <div class="stat-value">#2</div>
+      <div class="stat-sub">420 pts this season</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent-bar bg-coral"></div>
+      <div class="stat-label">Next holiday</div>
+      <div class="stat-value" style="font-size:20px;padding-top:4px">May 26</div>
+      <div class="stat-sub">Memorial Day · 57 days</div>
+    </div>
+  </div>
+
+  <!-- CHALLENGE (full width) -->
+  <div class="challenge-card" style="margin-bottom:16px">
+    <div class="ch-label">⚡ Your weekly challenge</div>
+    <div class="ch-name">Haley's Weekly Challenge</div>
+    <div class="ch-desc">Complete 3 client deliverable reviews before Thursday EOD, and share one piece of feedback in the #team-wins channel.</div>
+    <div class="ch-progress"><div class="ch-progress-fill" style="width:60%"></div></div>
+    <div class="ch-progress-label">2 of 3 complete · Ends Friday</div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid-main">
+
+    <!-- SCHEDULE PREVIEW -->
+    <div class="card" style="grid-column:span 2">
+      <div class="card-header">
+        <div class="card-title"><div class="card-dot bg-blue"></div>This week's schedule</div>
+        <a class="card-action" href="02-schedule.html">View full month →</a>
+      </div>
+      <div class="card-body">
+        <div class="schedule-week">
+          <div class="day-col">
+            <div class="day-label">Mon</div>
+            <div class="day-num today">30</div>
+            <div class="shift-block on">9am – 5pm<br>In-office</div>
+          </div>
+          <div class="day-col">
+            <div class="day-label">Tue</div>
+            <div class="day-num">31</div>
+            <div class="shift-block on">9am – 5pm<br>In-office</div>
+          </div>
+          <div class="day-col">
+            <div class="day-label">Wed</div>
+            <div class="day-num">1</div>
+            <div class="shift-block remote">9am – 5pm<br>Remote</div>
+          </div>
+          <div class="day-col">
+            <div class="day-label">Thu</div>
+            <div class="day-num">2</div>
+            <div class="shift-block on">9am – 5pm<br>In-office</div>
+          </div>
+          <div class="day-col">
+            <div class="day-label">Fri</div>
+            <div class="day-num">3</div>
+            <div class="shift-block off">Games day 🎲</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-dot bg-amber"></div>Friday Games</div>
+        <button class="btn btn-primary" onclick="document.getElementById('submit-modal').style.display='flex'">+ Submit</button>
+      </div>
+      <div class="card-body">
+        <div class="lb-row">
+          <div class="lb-rank gold">1</div>
+          <div class="lb-avatar" style="background:linear-gradient(135deg,#F0A500,#E85D4A)">RG</div>
+          <div class="lb-name">Roger G.</div>
+          <div>
+            <div class="lb-pts">510 pts</div>
+            <div class="lb-bar-wrap"><div class="lb-bar bg-amber" style="width:100%"></div></div>
+          </div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank silver">2</div>
+          <div class="lb-avatar" style="background:linear-gradient(135deg,#3B6FE8,#7C5CBF)">HL</div>
+          <div class="lb-name">Haley L. <span style="font-size:10px;color:var(--accent-blue)">you</span></div>
+          <div>
+            <div class="lb-pts">420 pts</div>
+            <div class="lb-bar-wrap"><div class="lb-bar bg-blue" style="width:82%"></div></div>
+          </div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank bronze">3</div>
+          <div class="lb-avatar" style="background:linear-gradient(135deg,#2DAE7F,#3B6FE8)">JM</div>
+          <div class="lb-name">Jordan M.</div>
+          <div>
+            <div class="lb-pts">385 pts</div>
+            <div class="lb-bar-wrap"><div class="lb-bar bg-green" style="width:75%"></div></div>
+          </div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="font-size:14px">4</div>
+          <div class="lb-avatar" style="background:linear-gradient(135deg,#E85D4A,#7C5CBF)">SP</div>
+          <div class="lb-name">Sam P.</div>
+          <div>
+            <div class="lb-pts">310 pts</div>
+            <div class="lb-bar-wrap"><div class="lb-bar bg-coral" style="width:60%"></div></div>
+          </div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="font-size:14px">5</div>
+          <div class="lb-avatar" style="background:linear-gradient(135deg,#7C5CBF,#2DAE7F)">TC</div>
+          <div class="lb-name">Taylor C.</div>
+          <div>
+            <div class="lb-pts">290 pts</div>
+            <div class="lb-bar-wrap"><div class="lb-bar bg-purple" style="width:56%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM GRID -->
+  <div class="grid-bottom">
+
+    <!-- ANNOUNCEMENTS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><div class="card-dot bg-coral"></div>Announcements</div>
+        <span class="badge badge-coral">2 new</span>
+      </div>
+      <div class="card-body">
+        <div class="announcement">
+          <div class="ann-dot bg-coral" style="background:var(--accent-coral)"></div>
+          <div>
+            <div class="ann-title">Q2 all-hands is April 10th 🎉</div>
+            <div class="ann-body">Mark your calendars — we'll be doing the full team retrospective and Q2 goal-setting session. Lunch is on us.</div>
+            <div class="ann-date">Today · Posted by Admin</div>
+          </div>
+        </div>
+        <div class="announcement">
+          <div class="ann-dot" style="background:var(--accent-blue)"></div>
+          <div>
+            <div class="ann-title">New onboarding doc in the Handbook</div>
+            <div class="ann-body">We've updated the client onboarding section with the new intake form templates. Check it out in the handbook.</div>
+            <div class="ann-date">Mar 27 · Posted by Ops</div>
+          </div>
+        </div>
+        <div class="announcement">
+          <div class="ann-dot" style="background:var(--accent-green)"></div>
+          <div>
+            <div class="ann-title">Summer hours start June 1</div>
+            <div class="ann-body">Friday afternoons off starting June 1 through August 31. Schedule will be updated in the portal.</div>
+            <div class="ann-date">Mar 22 · Posted by Admin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOLIDAYS + SOCIAL -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-dot bg-green"></div>Upcoming holidays</div>
+        </div>
+        <div class="card-body">
+          <div class="holiday-row">
+            <div class="hol-date"><div class="hol-month">Apr</div><div class="hol-day">18</div></div>
+            <div class="hol-name">Good Friday</div>
+            <span class="hol-tag">Paid</span>
+          </div>
+          <div class="holiday-row">
+            <div class="hol-date"><div class="hol-month">May</div><div class="hol-day">26</div></div>
+            <div class="hol-name">Memorial Day</div>
+            <span class="hol-tag">Paid</span>
+          </div>
+          <div class="holiday-row">
+            <div class="hol-date"><div class="hol-month">Jul</div><div class="hol-day">4</div></div>
+            <div class="hol-name">Independence Day</div>
+            <span class="hol-tag">Paid</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><div class="card-dot bg-purple"></div>Social links</div>
+        </div>
+        <div class="card-body">
+          <div class="social-row">
+            <button class="social-btn">📸 Instagram</button>
+            <button class="social-btn">💼 LinkedIn</button>
+            <button class="social-btn">🐦 X / Twitter</button>
+          </div>
+          <div class="social-post">
+            <div class="post-platform">Instagram · Latest post</div>
+            <div class="post-text">Behind the scenes at our Q1 client shoot — so proud of what this team pulled together. 🎬✨</div>
+            <div class="post-meta">3 days ago · 214 likes</div>
+          </div>
+          <div class="social-post">
+            <div class="post-platform">LinkedIn · Latest post</div>
+            <div class="post-text">We're hiring a senior strategist! If you know someone who'd be a great fit, send them our way.</div>
+            <div class="post-meta">5 days ago · 47 reactions</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- SUBMIT WINNER MODAL -->
+<div id="submit-modal" style="display:none;position:fixed;inset:0;background:rgba(28,28,46,0.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="background:var(--surface);border-radius:var(--radius);padding:28px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+    <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:4px">Submit winner</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Friday Games · Week of Mar 30</div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px">Game played</label>
+      <select style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--surface)">
+        <option>Trivia Royale</option><option>Skribbl.io</option><option>Kahoot</option><option>Among Us</option>
+      </select>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px">Winner</label>
+      <select style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;background:var(--surface)">
+        <option>Roger G.</option><option>Haley L.</option><option>Jordan M.</option><option>Sam P.</option><option>Taylor C.</option>
+      </select>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);display:block;margin-bottom:6px">Points awarded</label>
+      <input type="number" value="50" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:inherit;font-size:13px"/>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="document.getElementById('submit-modal').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" onclick="document.getElementById('submit-modal').style.display='none'">Submit winner</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

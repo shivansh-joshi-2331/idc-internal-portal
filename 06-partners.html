@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IDC Portal — Trusted Partners</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FFFFFF;--sidebar:#1A1A2E;--sidebar-text:#A8A8C0;
+  --text:#1C1C2E;--muted:#7A7A8C;--border:#E8E4DC;
+  --accent-blue:#3B6FE8;--accent-green:#2DAE7F;--accent-amber:#F0A500;--accent-coral:#E85D4A;--accent-purple:#7C5CBF;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;font-size:14px}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sidebar-logo .wordmark{font-family:'Fraunces',serif;font-size:22px;color:#fff;letter-spacing:-0.5px}
+.sidebar-logo .tag{font-size:10px;color:var(--sidebar-text);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:22px}
+.nav-label{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(168,168,192,0.5);padding:0 12px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);color:var(--sidebar-text);cursor:pointer;transition:all 0.15s;font-size:13px;text-decoration:none;margin-bottom:2px}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff}
+.nav-item.active{background:rgba(255,255,255,0.1);color:#fff;font-weight:500}
+.nav-item.admin-only{border-left:2px solid rgba(240,165,0,0.4)}
+.icon{width:16px;height:16px;opacity:0.7;flex-shrink:0}
+.nav-item.active .icon{opacity:1}
+.admin-badge{font-size:9px;font-weight:700;text-transform:uppercase;background:rgba(240,165,0,0.18);color:var(--accent-amber);border-radius:4px;padding:2px 5px;margin-left:auto;letter-spacing:0.06em}
+.sidebar-user{padding:16px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F0A500,#E85D4A);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-name{font-size:12px;color:#fff;font-weight:500}
+.user-role{font-size:10px;color:var(--sidebar-text)}
+.role-toggle{display:flex;gap:6px;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.rt-btn{flex:1;padding:6px;border-radius:6px;font-size:10px;font-weight:600;text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:var(--sidebar-text);background:transparent;transition:all 0.15s;font-family:inherit}
+.rt-btn.active{background:rgba(59,111,232,0.2);color:#7EB8FF;border-color:rgba(59,111,232,0.3)}
+.main{margin-left:220px;flex:1;padding:32px;max-width:1100px}
+.page-header{margin-bottom:28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.page-header h1{font-family:'Fraunces',serif;font-size:30px;font-weight:300;letter-spacing:-0.5px}
+.page-header h1 em{font-style:italic;color:var(--accent-green)}
+.page-header p{color:var(--muted);margin-top:4px;font-size:13px}
+
+/* CONTROLS */
+.controls{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.search-input{padding:9px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;outline:none;width:260px}
+.search-input:focus{border-color:var(--accent-blue)}
+.filter-tab{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all 0.15s}
+.filter-tab.active{background:var(--accent-green);color:#fff;border-color:var(--accent-green)}
+
+/* PARTNER GRID */
+.partner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.partner-card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;transition:all 0.2s;cursor:pointer}
+.partner-card:hover{border-color:#C8C0B0;box-shadow:0 4px 20px rgba(0,0,0,0.07);transform:translateY(-2px)}
+.pc-top{padding:20px 20px 16px;display:flex;align-items:flex-start;gap:14px}
+.pc-logo{width:44px;height:44px;border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:var(--bg)}
+.pc-name{font-size:15px;font-weight:600;margin-bottom:2px}
+.pc-tagline{font-size:12px;color:var(--muted)}
+.pc-cat{display:inline-flex;align-items:center;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;border:1px solid transparent;margin-top:6px}
+.pc-body{padding:0 20px 16px}
+.pc-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.pc-skills{display:flex;gap:5px;flex-wrap:wrap}
+.skill{padding:3px 9px;border-radius:6px;font-size:11px;font-weight:500;background:var(--bg);border:1px solid var(--border);color:var(--muted)}
+.pc-footer{padding:14px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.pc-contact{font-size:12px;color:var(--muted)}
+.pc-contact strong{color:var(--text);display:block;font-size:13px;margin-bottom:1px}
+.rating{display:flex;gap:2px;align-items:center}
+.star{color:var(--accent-amber);font-size:12px}
+.star.empty{color:var(--border)}
+.rating-val{font-size:12px;font-weight:600;margin-left:4px}
+.projects-chip{font-size:10px;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 7px;color:var(--muted);font-weight:500}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,28,46,0.5);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);padding:0;width:520px;box-shadow:0 20px 60px rgba(0,0,0,0.15);max-height:90vh;overflow-y:auto;animation:modalIn 0.25s cubic-bezier(0.34,1.4,0.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(0.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-hero{padding:28px 28px 20px;border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:flex-start}
+.modal-logo{width:52px;height:52px;border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--bg);flex-shrink:0}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted)}
+.modal-close:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.modal-name{font-family:'Fraunces',serif;font-size:22px;font-weight:300;margin-bottom:3px}
+.modal-tag{font-size:13px;color:var(--muted);margin-bottom:10px}
+.modal-body{padding:22px 28px}
+.modal-section{margin-bottom:20px}
+.modal-section-title{font-size:11px;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:10px}
+.modal-section p{font-size:13px;line-height:1.7;color:var(--text)}
+.modal-footer{padding:16px 28px;border-top:1px solid var(--border);display:flex;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-sm);padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all 0.15s}
+.btn-primary{background:var(--accent-green);color:#fff}
+.btn-primary:hover{background:#22946C}
+.btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent-blue);color:var(--accent-blue)}
+.prev-proj{display:flex;gap:8px;flex-direction:column}
+.proj-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border);font-size:13px}
+.proj-client{font-weight:500}
+.proj-date{font-size:11px;color:var(--muted)}
+
+#toast{position:fixed;bottom:28px;right:28px;background:var(--text);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:600;display:flex;align-items:center;gap:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.partner-card{animation:fadeUp 0.3s ease both}
+.partner-card:nth-child(2){animation-delay:.04s}
+.partner-card:nth-child(3){animation-delay:.08s}
+.partner-card:nth-child(4){animation-delay:.12s}
+.partner-card:nth-child(5){animation-delay:.16s}
+.partner-card:nth-child(6){animation-delay:.20s}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="wordmark">IDC</div><div class="tag">Internal Portal</div></div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-label">Workspace</div>
+      <a class="nav-item" href="01-dashboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
+      <a class="nav-item" href="02-schedule.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="11" rx="1.5"/><path d="M5 1v4M11 1v4M1 7h14"/></svg>Schedule</a>
+      <a class="nav-item" href="03-team.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="5" r="3"/><path d="M1 14c0-3 2-4.5 5-4.5s5 1.5 5 4.5"/></svg>Team</a>
+      <a class="nav-item" href="04-leaderboard.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1l2 4 5 .5-3.5 3.5 1 5L8 12l-4.5 2 1-5L1 5.5 6 5z"/></svg>Leaderboard</a>
+      <a class="nav-item" href="05-handbook.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="1" width="10" height="14" rx="1.5"/><path d="M5 5h4M5 8h4M5 11h2"/></svg>Handbook</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Ops</div>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1.5"/></svg>Client Budgets</a>
+      <a class="nav-item" href="03-ops-capacity.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Capacity</a>
+      <a class="nav-item active" href="#"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8l4-4 4 4 4-4"/><path d="M2 12l4-4 4 4 4-4"/></svg>Partners</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Admin</div>
+      <a class="nav-item admin-only" href="admin/01-invoices.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="14" height="10" rx="1.5"/><path d="M5 4V3a3 3 0 016 0v1"/></svg>Invoices<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/02-sales-pipeline.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-7"/></svg>Sales Pipeline<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="admin/03-analytics.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="8" width="3" height="6"/><rect x="6.5" y="5" width="3" height="9"/><rect x="11" y="2" width="3" height="12"/></svg>Analytics Hub<span class="admin-badge">Admin</span></a>
+      <a class="nav-item admin-only" href="07-hiring.html"><svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="6" r="4"/><path d="M2 14s1-4 6-4 6 4 6 4"/></svg>Hiring<span class="admin-badge">Admin</span></a>
+    </div>
+  </nav>
+  <div class="role-toggle"><button class="rt-btn active">Employee</button><button class="rt-btn">Admin</button></div>
+  <div class="sidebar-user"><div class="user-avatar">JL</div><div><div class="user-name">Jamie L.</div><div class="user-role">Designer</div></div></div>
+</aside>
+
+<main class="main">
+  <div class="page-header">
+    <div><h1>Trusted <em>Partners</em></h1><p>Vetted freelancers, studios & vendors · Ops-managed · Rate-negotiated</p></div>
+    <button class="btn btn-primary" onclick="showToast('Suggest a partner form opening soon','📬')">+ Suggest partner</button>
+  </div>
+
+  <div class="controls">
+    <input class="search-input" placeholder="Search name, skill, category…" oninput="filterPartners(this.value)"/>
+    <div class="filter-tab active" onclick="filterCat('all',this)">All</div>
+    <div class="filter-tab" onclick="filterCat('design',this)">Design</div>
+    <div class="filter-tab" onclick="filterCat('video',this)">Video</div>
+    <div class="filter-tab" onclick="filterCat('dev',this)">Dev</div>
+    <div class="filter-tab" onclick="filterCat('copy',this)">Copy</div>
+    <div class="filter-tab" onclick="filterCat('photo',this)">Photo</div>
+  </div>
+
+  <div class="partner-grid" id="pg">
+
+    <div class="partner-card" data-cat="video" onclick="openModal('🎬','Lens & Mill Studio','Full-service video production','video')">
+      <div class="pc-top">
+        <div class="pc-logo">🎬</div>
+        <div>
+          <div class="pc-name">Lens & Mill Studio</div>
+          <div class="pc-tagline">Full-service video production</div>
+          <div class="pc-cat" style="background:#FDEDEB;color:#B03020;border-color:#F5BDB5">Video</div>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-desc">High-end video production for brand films and commercials. Has shot campaigns for 3 of our current clients. Quick turnaround, always delivers.</div>
+        <div class="pc-skills"><span class="skill">Directing</span><span class="skill">Colour grade</span><span class="skill">VO</span><span class="skill">Sound design</span></div>
+      </div>
+      <div class="pc-footer">
+        <div class="pc-contact"><strong>Sasha K.</strong>sasha@lensmill.co</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="rating"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="rating-val">5.0</span></div>
+          <div class="projects-chip">7 projects</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="partner-card" data-cat="design" onclick="openModal('🎨','Studio Arktype','Brand identity & print design','design')">
+      <div class="pc-top">
+        <div class="pc-logo">🎨</div>
+        <div>
+          <div class="pc-name">Studio Arktype</div>
+          <div class="pc-tagline">Brand identity & print design</div>
+          <div class="pc-cat" style="background:#EBF0FD;color:#2850C0;border-color:#C0D0F8">Design</div>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-desc">Freelance brand studio run by two ex-agency designers. Exceptional taste. We bring them in for overflow identity work and packaging projects.</div>
+        <div class="pc-skills"><span class="skill">Branding</span><span class="skill">Print</span><span class="skill">Typography</span><span class="skill">Packaging</span></div>
+      </div>
+      <div class="pc-footer">
+        <div class="pc-contact"><strong>Mira V.</strong>mira@arktype.studio</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="rating"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="rating-val">4.9</span></div>
+          <div class="projects-chip">5 projects</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="partner-card" data-cat="dev" onclick="openModal('💻','CodeCraft Co.','Frontend development & Webflow','dev')">
+      <div class="pc-top">
+        <div class="pc-logo">💻</div>
+        <div>
+          <div class="pc-name">CodeCraft Co.</div>
+          <div class="pc-tagline">Frontend development & Webflow</div>
+          <div class="pc-cat" style="background:#F0EDFA;color:#5C3E9A;border-color:#C8B8F0">Dev</div>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-desc">Go-to dev partner for complex Webflow builds and custom React components. Works closely with Sofia on client sites. Fast, clean code, great communicator.</div>
+        <div class="pc-skills"><span class="skill">Webflow</span><span class="skill">React</span><span class="skill">CSS</span><span class="skill">Animations</span></div>
+      </div>
+      <div class="pc-footer">
+        <div class="pc-contact"><strong>Tom B.</strong>tom@codecraft.co</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="rating"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="rating-val">4.8</span></div>
+          <div class="projects-chip">9 projects</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="partner-card" data-cat="copy" onclick="openModal('✍️','The Copy Room','Strategic copywriting & brand voice','copy')">
+      <div class="pc-top">
+        <div class="pc-logo">✍️</div>
+        <div>
+          <div class="pc-name">The Copy Room</div>
+          <div class="pc-tagline">Strategic copywriting & brand voice</div>
+          <div class="pc-cat" style="background:#E8F7F2;color:#1A7A57;border-color:#A8DEC8">Copy</div>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-desc">Two-person copy team specialising in brand voice, long-form content, and campaign concepting. Work well alongside our strategy team on client briefs.</div>
+        <div class="pc-skills"><span class="skill">Brand voice</span><span class="skill">Campaign copy</span><span class="skill">UX writing</span></div>
+      </div>
+      <div class="pc-footer">
+        <div class="pc-contact"><strong>Lena & Karl</strong>hello@thecopyroom.co</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="rating"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star empty">★</span><span class="rating-val">4.2</span></div>
+          <div class="projects-chip">4 projects</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="partner-card" data-cat="photo" onclick="openModal('📸','Noor Visuals','Commercial photography & direction','photo')">
+      <div class="pc-top">
+        <div class="pc-logo">📸</div>
+        <div>
+          <div class="pc-name">Noor Visuals</div>
+          <div class="pc-tagline">Commercial photography & direction</div>
+          <div class="pc-cat" style="background:#FEF3DC;color:#A06500;border-color:#F0D490">Photo</div>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-desc">Our first call for product and lifestyle photography. Shot the Solis Health and Acme Corp brand libraries. Collaborative, fast edits, excellent art direction.</div>
+        <div class="pc-skills"><span class="skill">Product</span><span class="skill">Lifestyle</span><span class="skill">Retouching</span><span class="skill">Art direction</span></div>
+      </div>
+      <div class="pc-footer">
+        <div class="pc-contact"><strong>Noor A.</strong>noor@noorvisuals.com</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="rating"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="rating-val">5.0</span></div>
+          <div class="projects-chip">6 projects</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="partner-card" data-cat="video" onclick="openModal('🎙','VoiceFirst','Voiceover & audio production','video')">
+      <div class="pc-top">
+        <div class="pc-logo">🎙</div>
+        <div>
+          <div class="pc-name">VoiceFirst</div>
+          <div class="pc-tagline">Voiceover & audio production</div>
+          <div class="pc-cat" style="background:#FDEDEB;color:#B03020;border-color:#F5BDB5">Video</div>
+        </div>
+      </div>
+      <div class="pc-body">
+        <div class="pc-desc">Roster of vetted voiceover artists across multiple languages and styles. Also produces music beds and sound design. Studio-quality remote sessions.</div>
+        <div class="pc-skills"><span class="skill">Voiceover</span><span class="skill">Sound design</span><span class="skill">Music beds</span></div>
+      </div>
+      <div class="pc-footer">
+        <div class="pc-contact"><strong>Jamie O.</strong>jamie@voicefirst.io</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <div class="rating"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star empty">★</span><span class="rating-val">4.5</span></div>
+          <div class="projects-chip">3 projects</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- PARTNER MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-hero">
+      <div class="modal-logo" id="m-logo">🎬</div>
+      <div>
+        <div class="modal-name" id="m-name">Lens & Mill Studio</div>
+        <div class="modal-tag" id="m-tag">Full-service video production</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="rating"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="rating-val">5.0</span></div>
+          <span class="projects-chip">7 projects completed</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">About</div>
+        <p>High-end video production for brand films and commercials. Has shot campaigns for 3 of our current clients. Quick turnaround, always delivers. We've worked with them since 2024 and they're our first call for anything cinematic.</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Rate</div>
+        <p style="font-family:'Fraunces',serif;font-size:20px;color:var(--accent-green)">$1,200/day · $600 half-day</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px">IDC negotiated rate · Standard market is $1,800–2,200/day</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Past IDC projects</div>
+        <div class="prev-proj">
+          <div class="proj-row"><span class="proj-client">Acme Corp — Brand film</span><span class="proj-date">Nov 2025</span></div>
+          <div class="proj-row"><span class="proj-client">Nova Ventures — Product launch</span><span class="proj-date">Aug 2025</span></div>
+          <div class="proj-row"><span class="proj-client">Solis Health — Social campaign</span><span class="proj-date">Mar 2025</span></div>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Contact</div>
+        <p><strong>Sasha K.</strong> · sasha@lensmill.co · +1 (415) 555-0192</p>
+        <p style="font-size:12px;color:var(--muted);margin-top:4px">Typical response time: same business day</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" style="flex:1" onclick="showToast('Email client opened','📧')">Contact Sasha</button>
+      <button class="btn btn-ghost" onclick="showToast('Copied to clipboard','📋')">Copy email</button>
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>
+function filterCat(c,el){
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
+  document.querySelectorAll('.partner-card').forEach(c2=>{c2.style.display=(c==='all'||c2.dataset.cat===c)?'':'none';});
+}
+function filterPartners(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('.partner-card').forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(q)?'':'none';});
+}
+function openModal(logo,name,tag,cat){
+  document.getElementById('m-logo').textContent=logo;
+  document.getElementById('m-name').textContent=name;
+  document.getElementById('m-tag').textContent=tag;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function showToast(m,i='✓'){const t=document.getElementById('toast');t.innerHTML=`<span style="font-size:16px">${i}</span>${m}`;t.style.transform='translateY(0)';t.style.opacity='1';setTimeout(()=>{t.style.transform='translateY(80px)';t.style.opacity='0';},3000);}
+</script>
+</body>
+</html>
