@@ -52,7 +52,7 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (!token) return;
-    fetch("${process.env.NEXT_PUBLIC_API_URL}/api/notifications", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

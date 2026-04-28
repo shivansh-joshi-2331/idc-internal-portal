@@ -22,7 +22,7 @@ export default function AddAnnouncementModal({ onClose, onAdded }: AddAnnounceme
     setLoading(true);
 
     try {
-      const res = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/announcements", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/announcements`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -24,7 +24,7 @@ export default function TeamPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    fetch("${process.env.NEXT_PUBLIC_API_URL}/api/users", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
