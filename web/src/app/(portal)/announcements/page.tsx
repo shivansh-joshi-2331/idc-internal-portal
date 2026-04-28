@@ -25,7 +25,7 @@ export default function AnnouncementsPage() {
     })
       .then(res => res.json())
       .then(data => {
-         if(Array.isArray(data)) setAnnouncements(data);
+        if (Array.isArray(data)) setAnnouncements(data);
       })
       .catch(console.error);
   }, [token]);
@@ -56,32 +56,32 @@ export default function AnnouncementsPage() {
           <div className="text-sm text-muted">No announcements yet.</div>
         ) : (
           announcements.map((ann, i) => {
-          const style = PRIORITY_STYLE[ann.priority as keyof typeof PRIORITY_STYLE] ?? PRIORITY_STYLE.NORMAL;
-          return (
-            <div
-              key={ann.id}
-              className={cn("animate-fade-up rounded-[var(--radius)] border bg-surface p-6 transition-all hover:shadow-md", style.border)}
-              style={{ animationDelay: `${i * 0.06}s` }}
-            >
-              <div className="mb-3 flex items-center gap-3">
-                <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide", style.bg, style.text)}>
-                  {ann.priority}
-                </span>
-                <span className="text-[11px] text-muted">{formatDate(ann.createdAt, "relative")}</span>
-                {ann.author && (
-                  <span className="ml-auto flex items-center gap-1.5 text-[11px] text-muted">
-                    <div className="flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-bold text-white" style={{ background: ann.author.avatarGradient }}>
-                      {ann.author.initials}
-                    </div>
-                    {ann.author.firstName} {ann.author.lastName[0]}.
+            const style = PRIORITY_STYLE[ann.priority as keyof typeof PRIORITY_STYLE] ?? PRIORITY_STYLE.NORMAL;
+            return (
+              <div
+                key={ann.id}
+                className={cn("animate-fade-up rounded-[var(--radius)] border bg-surface p-6 transition-all hover:shadow-md", style.border)}
+                style={{ animationDelay: `${i * 0.06}s` }}
+              >
+                <div className="mb-3 flex items-center gap-3">
+                  <span className={cn("rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide", style.bg, style.text)}>
+                    {ann.priority}
                   </span>
-                )}
+                  <span className="text-[11px] text-muted">{formatDate(ann.createdAt, "relative")}</span>
+                  {ann.author && (
+                    <span className="ml-auto flex items-center gap-1.5 text-[11px] text-muted">
+                      <div className="flex h-5 w-5 items-center justify-center rounded-full text-[8px] font-bold text-white" style={{ background: ann.author.avatarGradient }}>
+                        {ann.author.initials}
+                      </div>
+                      {ann.author.firstName} {ann.author.lastName[0]}.
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-base font-semibold mb-2">{ann.title}</h3>
+                <p className="text-[13px] leading-relaxed text-muted whitespace-pre-wrap">{ann.body}</p>
               </div>
-              <h3 className="text-base font-semibold mb-2">{ann.title}</h3>
-              <p className="text-[13px] leading-relaxed text-muted whitespace-pre-wrap">{ann.body}</p>
-            </div>
-          );
-        }))}
+            );
+          }))}
       </div>
 
       {showAddModal && (
