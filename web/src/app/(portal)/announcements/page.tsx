@@ -56,7 +56,7 @@ export default function AnnouncementsPage() {
           <div className="text-sm text-muted">No announcements yet.</div>
         ) : (
           announcements.map((ann, i) => {
-          const style = PRIORITY_STYLE[ann.priority];
+          const style = PRIORITY_STYLE[ann.priority as keyof typeof PRIORITY_STYLE] ?? PRIORITY_STYLE.NORMAL;
           return (
             <div
               key={ann.id}

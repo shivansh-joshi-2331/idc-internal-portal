@@ -26,7 +26,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
     e.preventDefault();
     setLoading(true);
     
-    const skills = skillsStr.split(",").map(s => s.trim()).filter(Boolean);
+    const skills = skillsStr.split(",").map((s: string) => s.trim()).filter(Boolean);
     
     try {
       const res = await fetch(`http://localhost:4000/api/users/${user.id}`, {

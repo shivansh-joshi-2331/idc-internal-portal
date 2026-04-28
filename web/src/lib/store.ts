@@ -11,6 +11,12 @@ interface User {
   department: string;
   jobTitle: string;
   avatarGradient: string;
+  bio?: string;
+  skills?: string[];
+  funFact?: string;
+  socialLinks?: { linkedin?: string; behance?: string; twitter?: string };
+  joinedAt?: string;
+  isActive?: boolean;
 }
 
 interface AuthState {

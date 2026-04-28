@@ -153,9 +153,9 @@ export default function TeamPage() {
       {view === "grid" && (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           {filtered.map((u, i) => {
-            const status = STATUSES[u.id] || "out";
+            const status = (STATUSES[u.id] || "out") as AttendanceStatus;
             const statusConfig = STATUS_CONFIG[status];
-            const deptConfig = DEPT_CONFIG[u.department];
+            const deptConfig = DEPT_CONFIG[u.department as Department];
 
             return (
               <div
@@ -221,9 +221,9 @@ export default function TeamPage() {
       {view === "list" && (
         <div className="rounded-[var(--radius)] border border-border-c bg-surface overflow-hidden">
           {filtered.map((u) => {
-            const status = STATUSES[u.id] || "out";
+            const status = (STATUSES[u.id] || "out") as AttendanceStatus;
             const statusConfig = STATUS_CONFIG[status];
-            const deptConfig = DEPT_CONFIG[u.department];
+            const deptConfig = DEPT_CONFIG[u.department as Department];
             return (
               <div
                 key={u.id}
@@ -277,10 +277,10 @@ export default function TeamPage() {
                 </div>
                 <div>
                   <div className="font-display text-[26px] font-light leading-none">{selected.firstName} {selected.lastName}</div>
-                  <div className="mt-1 text-[13px] text-muted">{selected.jobTitle} · {DEPT_CONFIG[selected.department].label}</div>
-                  <div className="mt-2 flex items-center gap-1.5 text-[11px]" style={{ color: STATUS_CONFIG[selectedStatus].color }}>
-                    <div className="h-[7px] w-[7px] rounded-full" style={{ background: STATUS_CONFIG[selectedStatus].color }} />
-                    {STATUS_CONFIG[selectedStatus].label}
+                  <div className="mt-1 text-[13px] text-muted">{selected.jobTitle} · {DEPT_CONFIG[selected.department as Department]?.label}</div>
+                  <div className="mt-2 flex items-center gap-1.5 text-[11px]" style={{ color: STATUS_CONFIG[selectedStatus as AttendanceStatus]?.color }}>
+                    <div className="h-[7px] w-[7px] rounded-full" style={{ background: STATUS_CONFIG[selectedStatus as AttendanceStatus]?.color }} />
+                    {STATUS_CONFIG[selectedStatus as AttendanceStatus]?.label}
                     {selected.funFact && <span className="text-muted"> · {selected.funFact}</span>}
                   </div>
                 </div>
