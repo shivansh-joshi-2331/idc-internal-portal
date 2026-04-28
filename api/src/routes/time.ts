@@ -108,7 +108,7 @@ router.post('/', authMiddleware, async (req: AuthRequest, res) => {
 // Delete an entry
 router.delete('/:id', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const userId = req.user!.userId;
 
     // Ensure user owns the entry

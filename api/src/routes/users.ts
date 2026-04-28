@@ -91,7 +91,7 @@ router.post('/', authMiddleware, adminGuard, async (req: AuthRequest, res) => {
 // Update user profile (Employee can update their own, Admin can update anyone's)
 router.put('/:id', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { bio, skills, socialLinks, funFact } = req.body;
     
     // Check permissions
@@ -136,7 +136,7 @@ router.put('/:id', authMiddleware, async (req: AuthRequest, res) => {
 // Delete user (Admin only)
 router.delete('/:id', authMiddleware, adminGuard, async (req: AuthRequest, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     
     // Check if user exists
     const existing = await prisma.user.findUnique({ where: { id } });

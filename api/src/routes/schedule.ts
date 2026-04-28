@@ -136,7 +136,7 @@ router.post('/leave', authMiddleware, async (req: AuthRequest, res) => {
 // Admin: Review and Approve/Reject Leave Request
 router.put('/leave/:id', authMiddleware, adminGuard, async (req: AuthRequest, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     const { status } = req.body; // 'APPROVED' | 'REJECTED'
 
     const request = await prisma.leaveRequest.update({

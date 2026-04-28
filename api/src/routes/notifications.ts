@@ -35,7 +35,7 @@ router.get('/', authMiddleware, async (req: AuthRequest, res) => {
 // Mark notification as read
 router.put('/:id/read', authMiddleware, async (req: AuthRequest, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id as string;
     
     const notification = await prisma.notification.findUnique({ where: { id } });
     if (!notification) return res.status(404).json({ message: 'Not found' });
