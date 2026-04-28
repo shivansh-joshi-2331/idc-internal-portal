@@ -64,7 +64,7 @@ export default function SchedulePage() {
       const data = await res.json();
       setScheduleEntries(data);
 
-      const uRes = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/users", {
+      const uRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsersList(await uRes.json());
@@ -237,7 +237,7 @@ export default function SchedulePage() {
     endTime.setHours(Math.floor(dragFinalEnd), (dragFinalEnd % 1) * 60, 0, 0);
 
     try {
-      const res = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/time", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/time`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ taskName: newTaskTitle, startTime, endTime })
@@ -264,7 +264,7 @@ export default function SchedulePage() {
   const submitLeaveRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/schedule/leave", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schedule/leave`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ startDate: leaveStart, endDate: leaveEnd, reason: leaveReason })
