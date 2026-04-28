@@ -12,7 +12,7 @@ interface ProfileModalProps {
 export default function ProfileModal({ onClose }: ProfileModalProps) {
   const { user, token, updateUser } = useAuthStore();
   const [loading, setLoading] = useState(false);
-  
+
   // @ts-ignore - bio, skills, funFact might be missing from User type initially
   const [bio, setBio] = useState(user?.bio || "");
   // @ts-ignore
@@ -25,11 +25,11 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     const skills = skillsStr.split(",").map((s: string) => s.trim()).filter(Boolean);
-    
+
     try {
-      const res = await fetch(`http://localhost:4000/api/users/${user.id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
         },
         body: JSON.stringify({ bio, skills, funFact })
       });
-      
+
       if (res.ok) {
         const updatedUser = await res.json();
         updateUser(updatedUser);
@@ -62,7 +62,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
             <X className="h-5 w-5 text-muted hover:text-text" />
           </button>
         </div>
-        
+
         <form onSubmit={handleSave} className="p-6 flex-1 overflow-y-auto space-y-5">
           <div className="flex items-center gap-4 mb-2">
             <div
@@ -97,7 +97,7 @@ export default function ProfileModal({ onClose }: ProfileModalProps) {
               className="w-full border border-border-c bg-bg rounded-md px-3 py-2.5 text-[13px] outline-none focus:border-accent-primary transition-colors"
             />
           </div>
-          
+
           <div>
             <label className="text-[10px] font-bold tracking-widest uppercase text-muted block mb-1.5">Fun Fact</label>
             <input

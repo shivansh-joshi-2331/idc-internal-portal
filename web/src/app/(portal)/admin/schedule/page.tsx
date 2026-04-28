@@ -17,7 +17,7 @@ export default function AdminSchedulePage() {
   // Fetch true users from API on mount
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:4000/api/users", {
+    fetch("${process.env.NEXT_PUBLIC_API_URL}/api/users", {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -30,7 +30,7 @@ export default function AdminSchedulePage() {
   }, [token]);
 
   const fetchPendingLeaves = () => {
-    fetch("http://localhost:4000/api/schedule/leave/pending", {
+    fetch("${process.env.NEXT_PUBLIC_API_URL}/api/schedule/leave/pending", {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -42,7 +42,7 @@ export default function AdminSchedulePage() {
 
   const handleLeaveAction = async (id: string, status: "APPROVED" | "REJECTED") => {
     try {
-      const res = await fetch(`http://localhost:4000/api/schedule/leave/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/schedule/leave/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export default function AdminSchedulePage() {
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:4000/api/schedule/entry", {
+      const res = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/schedule/entry", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

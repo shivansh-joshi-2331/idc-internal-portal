@@ -24,7 +24,7 @@ export default function TeamPage() {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/users", {
+    fetch("${process.env.NEXT_PUBLIC_API_URL}/api/users", {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -49,9 +49,9 @@ export default function TeamPage() {
 
   const handleDeleteEmployee = async (id: string) => {
     setLoading(true);
-    
+
     try {
-      const res = await fetch(`http://localhost:4000/api/users/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -314,47 +314,47 @@ export default function TeamPage() {
                 ))}
               </div>
 
-                <div className="mt-auto pt-8 flex flex-col gap-2.5">
-                  <div className="flex gap-2.5">
-                    <button className="flex-1 rounded-lg bg-accent-blue px-4 py-2.5 text-[13px] font-medium text-white hover:bg-[#2A5ED4] transition-colors">
-                      Message {selected.firstName}
-                    </button>
-                    <button className="rounded-lg border border-border-c bg-surface px-4 py-2.5 text-[13px] font-medium text-text hover:border-accent-blue hover:text-accent-blue transition-colors">
-                      View schedule
-                    </button>
-                  </div>
-                  {isAdmin && selected.id !== user?.id && (
-                    <>
-                      {deleteConfirm ? (
-                        <div className="rounded-lg border border-coral-border bg-coral-bg p-4 mt-2">
-                          <div className="text-[13px] font-bold text-coral-text mb-1">Confirm Deletion</div>
-                          <div className="text-[11px] text-coral-text/80 mb-3">This action cannot be undone and will delete all associated records.</div>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => setDeleteConfirm(false)}
-                              className="flex-1 rounded-md border border-coral-border px-3 py-2 text-[11px] font-bold text-coral-text hover:bg-surface transition-colors"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={() => handleDeleteEmployee(selected.id)}
-                              className="flex-1 rounded-md bg-accent-coral px-3 py-2 text-[11px] font-bold text-white hover:brightness-110 transition-colors"
-                            >
-                              {loading ? "Deleting..." : "Delete"}
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setDeleteConfirm(true)}
-                          className="w-full rounded-lg border border-coral-border text-coral-text py-2.5 text-[13px] font-medium hover:bg-coral-bg transition-colors mt-2"
-                        >
-                          Delete Employee
-                        </button>
-                      )}
-                    </>
-                  )}
+              <div className="mt-auto pt-8 flex flex-col gap-2.5">
+                <div className="flex gap-2.5">
+                  <button className="flex-1 rounded-lg bg-accent-blue px-4 py-2.5 text-[13px] font-medium text-white hover:bg-[#2A5ED4] transition-colors">
+                    Message {selected.firstName}
+                  </button>
+                  <button className="rounded-lg border border-border-c bg-surface px-4 py-2.5 text-[13px] font-medium text-text hover:border-accent-blue hover:text-accent-blue transition-colors">
+                    View schedule
+                  </button>
                 </div>
+                {isAdmin && selected.id !== user?.id && (
+                  <>
+                    {deleteConfirm ? (
+                      <div className="rounded-lg border border-coral-border bg-coral-bg p-4 mt-2">
+                        <div className="text-[13px] font-bold text-coral-text mb-1">Confirm Deletion</div>
+                        <div className="text-[11px] text-coral-text/80 mb-3">This action cannot be undone and will delete all associated records.</div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setDeleteConfirm(false)}
+                            className="flex-1 rounded-md border border-coral-border px-3 py-2 text-[11px] font-bold text-coral-text hover:bg-surface transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => handleDeleteEmployee(selected.id)}
+                            className="flex-1 rounded-md bg-accent-coral px-3 py-2 text-[11px] font-bold text-white hover:brightness-110 transition-colors"
+                          >
+                            {loading ? "Deleting..." : "Delete"}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeleteConfirm(true)}
+                        className="w-full rounded-lg border border-coral-border text-coral-text py-2.5 text-[13px] font-medium hover:bg-coral-bg transition-colors mt-2"
+                      >
+                        Delete Employee
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </>

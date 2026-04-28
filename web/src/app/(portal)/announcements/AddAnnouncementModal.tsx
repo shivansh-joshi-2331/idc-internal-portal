@@ -12,7 +12,7 @@ interface AddAnnouncementModalProps {
 export default function AddAnnouncementModal({ onClose, onAdded }: AddAnnouncementModalProps) {
   const { token } = useAuthStore();
   const [loading, setLoading] = useState(false);
-  
+
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [priority, setPriority] = useState("NORMAL");
@@ -20,9 +20,9 @@ export default function AddAnnouncementModal({ onClose, onAdded }: AddAnnounceme
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      const res = await fetch("http://localhost:4000/api/announcements", {
+      const res = await fetch("${process.env.NEXT_PUBLIC_API_URL}/api/announcements", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +30,7 @@ export default function AddAnnouncementModal({ onClose, onAdded }: AddAnnounceme
         },
         body: JSON.stringify({ title, body, priority })
       });
-      
+
       if (res.ok) {
         const newAnn = await res.json();
         onAdded(newAnn);
@@ -56,7 +56,7 @@ export default function AddAnnouncementModal({ onClose, onAdded }: AddAnnounceme
             <X className="h-5 w-5 text-muted hover:text-text" />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 flex-1 overflow-y-auto space-y-4">
           <div>
             <label className="text-[10px] font-bold tracking-widest uppercase text-muted block mb-1.5">Title</label>

@@ -52,26 +52,26 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:4000/api/notifications", {
+    fetch("${process.env.NEXT_PUBLIC_API_URL}/api/notifications", {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
       .then(data => {
-         if(Array.isArray(data)) setNotifications(data);
+        if (Array.isArray(data)) setNotifications(data);
       })
       .catch(console.error);
   }, [token]);
 
   const handleRead = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:4000/api/notifications/${id}/read`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${id}/read`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
         setNotifications(notifications.map(n => n.id === id ? { ...n, isRead: true } : n));
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleNotificationClick = (n: any) => {
@@ -170,7 +170,7 @@ export default function Sidebar() {
 
       {/* User */}
       <div className="relative">
-        <div 
+        <div
           className="group flex items-center gap-3 border-t border-border-c px-4 py-4 cursor-pointer hover:bg-bg transition-colors"
           onClick={() => setShowProfile(true)}
         >
@@ -182,8 +182,8 @@ export default function Sidebar() {
               {user.initials}
             </div>
             {!isProfileComplete && (
-              <span 
-                className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-surface" 
+              <span
+                className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-red-500 border-2 border-surface"
                 title="Complete your profile!"
               />
             )}
@@ -194,7 +194,7 @@ export default function Sidebar() {
             </div>
             <div className="text-[11px] text-muted">{user.jobTitle}</div>
           </div>
-          
+
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -232,23 +232,23 @@ export default function Sidebar() {
                 <div className="p-4 text-center text-xs text-muted">No notifications</div>
               ) : (
                 notifications.map(n => (
-                  <div 
-                    key={n.id} 
+                  <div
+                    key={n.id}
                     onClick={() => handleNotificationClick(n)}
                     className={cn(
-                      "p-3 text-[13px] cursor-pointer hover:bg-bg/50 transition-colors", 
+                      "p-3 text-[13px] cursor-pointer hover:bg-bg/50 transition-colors",
                       !n.isRead ? "bg-accent-primary/5" : "opacity-70"
                     )}
                   >
                     <div className="flex justify-between items-start mb-1">
                       <strong className="text-text">{n.title}</strong>
                       {!n.isRead && (
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleRead(n.id);
-                          }} 
-                          className="text-accent-primary hover:text-text" 
+                          }}
+                          className="text-accent-primary hover:text-text"
                           title="Mark as read"
                         >
                           <Check className="h-3.5 w-3.5" />

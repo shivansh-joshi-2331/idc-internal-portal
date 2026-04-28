@@ -20,7 +20,7 @@ export default function AnnouncementsPage() {
 
   useEffect(() => {
     if (!token) return;
-    fetch("http://localhost:4000/api/announcements", {
+    fetch("${process.env.NEXT_PUBLIC_API_URL}/api/announcements", {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
